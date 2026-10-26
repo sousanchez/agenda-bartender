@@ -92,11 +92,13 @@ h1 { font-family: var(--f-display); font-weight: 700; font-size: clamp(26px, 4vw
 .day.out .dn { opacity: 0.4; }
 .dn { font-family: var(--f-display); font-weight: 600; font-size: 14px; width: 26px; height: 26px; display: grid; place-items: center; border-radius: 50%; font-variant-numeric: tabular-nums; }
 .day.today .dn { background: var(--accent); color: var(--accent-fg); }
-.chip { display: flex; align-items: center; gap: 6px; width: 100%; min-width: 0; text-align: left; padding: 4px 6px; border: 0; border-radius: 7px; background: var(--cbg); font-size: 12.5px; line-height: 1.25; }
-.chip i { flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--c); }
-.chip b { flex: none; font-weight: 600; font-variant-numeric: tabular-nums; }
-.chip .nm { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.chip .g { flex: none; color: var(--muted); font-variant-numeric: tabular-nums; }
+.chip { display: flex; align-items: flex-start; gap: 6px; width: 100%; min-width: 0; text-align: left; padding: 5px 7px; border: 0; border-radius: 7px; background: var(--cbg); font-size: 12.5px; line-height: 1.25; }
+.chip i { flex: none; width: 8px; height: 8px; margin-top: 4px; border-radius: 50%; background: var(--c); }
+.chip .tx { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.chip .top { display: flex; justify-content: space-between; gap: 6px; font-variant-numeric: tabular-nums; }
+.chip b { font-weight: 600; }
+.chip .g { color: var(--muted); }
+.chip .nm { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; }
 .chip:hover { filter: brightness(0.96); }
 
 .agenda { display: none; flex-direction: column; gap: 14px; }
@@ -113,17 +115,30 @@ h1 { font-family: var(--f-display); font-weight: 700; font-size: clamp(26px, 4vw
 .card .r3 { font-size: 13px; color: var(--muted); }
 .empty { padding: 28px 16px; text-align: center; color: var(--muted); background: var(--surface); border: 1px dashed var(--line); border-radius: 14px; margin-top: 14px; }
 
+.wk { margin-top: 18px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 16px 16px 12px; }
+.wk h2 { font-family: var(--f-display); font-size: 16px; font-weight: 600; margin: 0 0 12px; }
+.wk .wkn { font-family: var(--f-body); font-size: 12px; font-weight: 400; color: var(--muted); margin-left: 6px; }
+.wkbars { display: flex; gap: 12px; }
+.wkc { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; border-radius: 8px; padding: 2px; }
+.wkc:hover, .wkc:focus-visible { background: var(--surface2); }
+.wkv { text-align: center; font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.wkp { height: 110px; display: flex; align-items: flex-end; border-bottom: 1px solid var(--line); }
+.wkb { width: 100%; max-width: 56px; margin: 0 auto; background: var(--accent); border-radius: 4px 4px 0 0; min-height: 2px; }
+.wkl { text-align: center; font-size: 11px; line-height: 1.25; color: var(--muted); font-variant-numeric: tabular-nums; }
 .foot { margin-top: 18px; color: var(--muted); font-size: 13px; max-width: 70ch; }
 
 #overlay { position: fixed; inset: 0; z-index: 20; }
 .scrim { position: absolute; inset: 0; background: var(--scrim); }
 .sheet { position: absolute; top: 0; right: 0; bottom: 0; width: min(460px, 100%); background: var(--surface); border-left: 1px solid var(--line); display: flex; flex-direction: column; }
-.sh-head { padding: 18px 20px 14px; padding-top: max(18px, env(safe-area-inset-top, 0px)); border-bottom: 1px solid var(--line); background: var(--cbg); }
-.sh-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
-.sp-tag { display: inline-flex; align-items: center; gap: 8px; font-weight: 600; font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; }
-.sp-tag i { width: 10px; height: 10px; border-radius: 50%; background: var(--c); }
+.sh-head { position: relative; padding: 20px 68px 16px 20px; padding-top: max(20px, env(safe-area-inset-top, 0px)); border-bottom: 1px solid var(--line); background: var(--cbg); }
+.sh-head #close { position: absolute; top: max(14px, env(safe-area-inset-top, 0px)); right: 14px; background: var(--surface); }
 .sh-head h3 { font-family: var(--f-display); font-size: 24px; line-height: 1.15; margin: 0; font-weight: 700; letter-spacing: -0.01em; text-wrap: balance; overflow-wrap: anywhere; }
-.sh-head p { margin: 4px 0 0; color: var(--muted); }
+.sh-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; margin: 8px 0 0; }
+.sh-meta i { width: 10px; height: 10px; border-radius: 50%; background: var(--c); flex: none; }
+.sh-meta b { font-weight: 600; }
+#sh-date { color: var(--muted); }
+#sh-date::before { content: "·"; margin-right: 8px; }
+.lock { overflow: hidden; }
 .sh-body { padding: 16px 20px; overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 18px; min-height: 0; }
 .facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 16px; margin: 0; }
 .facts div { min-width: 0; }
@@ -135,16 +150,23 @@ h1 { font-family: var(--f-display); font-weight: 700; font-size: clamp(26px, 4vw
 .badge.na { background: var(--acqua-bg); color: var(--acqua); }
 .badge.nd { background: var(--warn-bg); color: var(--warn); }
 .sec h4 { font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin: 0 0 8px; font-weight: 600; }
-.sec ul { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 4px; }
+.sec ul:not(.menu) { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 4px; }
 .docs { display: flex; flex-wrap: wrap; gap: 6px; }
 .doc { padding: 4px 10px; border-radius: 8px; border: 1px solid var(--line); font-size: 13px; background: var(--bg); }
 .doc.miss { border-style: dashed; color: var(--warn); }
 .muted { color: var(--muted); margin: 0; }
+.ctl { display: flex; flex-direction: column; gap: 10px; }
+.ctl .chk { display: flex; align-items: center; gap: 10px; font-weight: 500; }
+.ctl input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--accent); }
+.ctl .f { display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: var(--muted); }
+.ctl input[type="text"], .ctl textarea { font: inherit; font-size: 15px; color: var(--fg); background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; width: 100%; }
+.ctl textarea { min-height: 72px; resize: vertical; }
+.ctl .st { font-size: 12px; color: var(--muted); min-height: 1.2em; }
 .mn { margin-top: 12px; }
 .mn:first-of-type { margin-top: 0; }
 .mn h5 { margin: 0 0 6px; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
 .mn h5 span { font-size: 12px; font-weight: 500; color: var(--muted); font-variant-numeric: tabular-nums; }
-.menu { list-style: none !important; padding-left: 0 !important; display: grid !important; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 6px !important; }
+.menu { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 6px; }
 .menu li { position: relative; padding: 6px 10px 6px 24px; border-radius: 8px; background: var(--bg); border: 1px solid var(--line); font-size: 14px; overflow-wrap: anywhere; }
 .menu li::before { content: ""; position: absolute; left: 10px; top: 13px; width: 7px; height: 7px; border-radius: 50%; background: var(--c); }
 .mn.sem li::before { background: transparent; box-shadow: inset 0 0 0 2px var(--c); }
@@ -158,13 +180,14 @@ h1 { font-family: var(--f-display); font-weight: 700; font-size: clamp(26px, 4vw
   .cal { display: none; }
   .agenda { display: flex; }
   .sheet { top: auto; left: 0; max-height: 90%; border-left: 0; border-top: 1px solid var(--line); border-radius: 18px 18px 0 0; }
-  .sh-head { border-radius: 18px 18px 0 0; padding-top: 18px; }
+  .sh-head { border-radius: 18px 18px 0 0; padding-top: 20px; }
+  .sh-head #close { top: 14px; }
   .nav { width: 100%; justify-content: space-between; }
 }
 @media (prefers-reduced-motion: no-preference) {
   .sheet { animation: slide 0.18s ease-out; }
-  @keyframes slide { from { transform: translateX(24px); opacity: 0; } to { transform: none; opacity: 1; } }
-  @media (max-width: 720px) { @keyframes slide { from { transform: translateY(24px); opacity: 0; } to { transform: none; opacity: 1; } } }
+  @keyframes slide { from { transform: translateX(24px); } to { transform: none; } }
+  @media (max-width: 720px) { @keyframes slide { from { transform: translateY(24px); } to { transform: none; } } }
 }
 
 html { color-scheme: light; }
@@ -181,9 +204,9 @@ img { max-width: 100%; }
       <p class="sub">Eventos confirmados no #planejamento-bartender. Toque num evento para ver tudo dele.</p>
     </div>
     <div class="nav">
-      <button class="icon-btn" id="prev" aria-label="Mês anterior">‹</button>
+      <button class="icon-btn" id="prev" aria-label="Mês anterior"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
       <h2 id="mlabel" aria-live="polite"></h2>
-      <button class="icon-btn" id="next" aria-label="Próximo mês">›</button>
+      <button class="icon-btn" id="next" aria-label="Próximo mês"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
     </div>
   </header>
 
@@ -196,6 +219,11 @@ img { max-width: 100%; }
   <div class="agenda" id="agenda"></div>
   <div class="empty" id="empty" hidden></div>
 
+  <section class="wk" id="wk-sec" aria-labelledby="wk-h" hidden>
+    <h2 id="wk-h">Convidados por semana <span class="wkn">só eventos do mês exibido, sem staff</span></h2>
+    <div class="wkbars" id="wk" role="list"></div>
+  </section>
+
   <p class="foot">Fonte: posts do canal até 23/10/2026. Os cardápios de drinks vêm dos PDFs de Bartender anexados no Slack. Convidados não incluem staff.</p>
 </div>
 
@@ -203,12 +231,9 @@ img { max-width: 100%; }
   <div class="scrim" id="scrim"></div>
   <aside class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sh-title">
     <div class="sh-head">
-      <div class="sh-top">
-        <span class="sp-tag"><i></i><span id="sh-space"></span></span>
-        <button class="icon-btn" id="close" aria-label="Fechar">✕</button>
-      </div>
+      <button class="icon-btn" id="close" aria-label="Fechar"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
       <h3 id="sh-title"></h3>
-      <p id="sh-date"></p>
+      <p class="sh-meta"><i></i><b id="sh-space"></b><span id="sh-date"></span></p>
     </div>
     <div class="sh-body" id="sh-body"></div>
     <div class="sh-foot">
@@ -325,11 +350,12 @@ const EVENTS = [
 /* Cardápios conforme os PDFs de Bartender de cada evento. Sem PDF = sem cardápio. */
 const SEM4 = ["Moranguinho", "Piña Colada", "Limonada Suíça", "Mix de Maracujá"];
 const COM11 = ["Caipirinha", "Caipiroska", "Saquêrinhas", "Espanhola", "Sex on the Beach", "Gin Tônica", "Mojito", "Aperol Spritz", "Moscow Mule", "Negroni", "Lagoa Azul"];
+const COM11_MARCAS = ["Caipirinha (pinga Salinas)", "Caipiroska (vodka Smirnoff)", "Saquêrinhas (saquê Fuji e Sakeih)", "Espanhola (vinho)", "Lagoa Azul", "Sex on the Beach", "Mojito", "Gin Tônica (gin Tanqueray)", "Aperol Spritz", "Moscow Mule", "Negroni"];
 const SEM9 = ["Moranguinho", "Piña Colada", "Limonada Suíça", "Mix de Maracujá", "Sex on the Beach", "Banana Mix", "Tropical de Frutas", "Gostinho de Infância", "Melancia"];
 const SEM10 = [...SEM9, "Kiwi Kiss"];
 const DRINKS = {
   1: { com: ["Caipirinha (cachaça Salinas ou equivalente)", "Caipiroska (vodka Smirnoff ou equivalente)", "Saquêrinhas (saquê Fuji e/ou Sakeih ou equivalente)", "Gin Tônica (gin Tanqueray)", "Mojito", "Aperol Spritz", "Moscow Mule", "Cosmopolitan", "Limoncello (drink especial/autoral)"], sem: SEM4 },
-  3: { com: [], sem: ["Moranguinho", "Piña Colada", "Limonada Suíça", "Mix de Maracujá", "Sex on the Beach", "Banana Mix", "Tropical de Frutas", "Gostinho de Infância", "Melancia"] },
+  3: { com: [], sem: SEM9 },
   4: { com: COM11, sem: SEM4 },
   5: { com: ["Caipirinha", "Caipiroska", "Saquêrinhas", "Sex on the Beach", "Gin Tônica", "Mango Passion", "Aperol Spritz", "Moscow Mule", "Negroni", "Lagoa Azul", "Limoncello Spritz"], sem: SEM4 },
   6: { com: COM11, sem: SEM4 },
@@ -341,7 +367,7 @@ const DRINKS = {
         extra: ["Ponto extra de bar ao lado da Capella", "Árvore de limão siciliano no centro do bar", "Torre de taças (30 unidades)", "Upgrade de vodka Absolut"] },
   11: { com: COM11, sem: SEM4 },
   12: { com: [...COM11, "Mango Passion (os noivos gostam bastante; cuidado para não deixar aguado)"], sem: SEM4 },
-  13: { com: [], sem: ["Moranguinho", "Piña Colada", "Limonada Suíça", "Mix de Maracujá", "Sex on the Beach", "Banana Mix", "Tropical de Frutas", "Gostinho de Infância", "Melancia", "Kiwi Kiss"] },
+  13: { com: [], sem: SEM10 },
   14: { com: [], sem: ["Moranguinho", "Piña Colada", "Limonada Suíça", "Mix de Maracujá", "Sex on the Beach", "Tropical de Frutas", "Mango Passion (sem álcool)", "Moscow Mule (sem álcool)"],
         extra: ["Copos mais elaborados para os drinks, se houver disponível"] },
 
@@ -354,9 +380,9 @@ const DRINKS = {
   21: { com: ["Caipiroska", "Saquêrinhas", "Sex on the Beach", "Gin Tônica", "Mojito", "Aperol Spritz", "Moscow Mule", "Mango Passion", "Limoncello Spritz"], sem: SEM4 },
   22: { com: ["Caipirinha", "Caipiroska", "Saquêrinhas", "Moscow Mule"], sem: ["Moranguinho", "Piña Colada"] },
   23: { com: [], sem: SEM10 },
-  24: { com: ["Caipirinha (pinga Salinas)", "Caipiroska (vodka Smirnoff)", "Saquêrinhas (saquê Fuji e Sakeih)", "Espanhola (vinho)", "Lagoa Azul", "Sex on the Beach", "Mojito", "Gin Tônica (gin Tanqueray)", "Aperol Spritz", "Moscow Mule", "Negroni"], sem: SEM4 },
+  24: { com: COM11_MARCAS, sem: SEM4 },
   25: { com: ["Caipirinha", "Caipiroska", "Saquêrinhas", "Sex on the Beach", "Gin Tônica", "Mojito", "Aperol Spritz", "Moscow Mule", "Negroni"], sem: SEM4 },
-  26: { com: ["Caipirinha (pinga Salinas)", "Caipiroska (vodka Smirnoff)", "Saquêrinhas (saquê Fuji e Sakeih)", "Espanhola (vinho)", "Lagoa Azul", "Sex on the Beach", "Mojito", "Gin Tônica (gin Tanqueray)", "Aperol Spritz", "Moscow Mule", "Negroni"], sem: SEM4 },
+  26: { com: COM11_MARCAS, sem: SEM4 },
   27: { com: COM11, sem: SEM4 },
   28: { com: ["Caipirinha (pinga Salinas)", "Caipiroska (vodka Smirnoff)", "Saquêrinhas (saquê Fuji e Sakeih)", "Piña Colada com álcool", "Sex on the Beach", "Gin Tônica (gin Tanqueray)", "Mojito", "Aperol Spritz", "Moscow Mule", "Negroni", "Limoncello Spritz"], sem: SEM4 },
   29: { com: ["Caipirinha", "Caipiroska", "Saquêrinhas", "Aperol Spritz", "Gin Tônica", "Limoncello Spritz", "Moscow Mule", "Negroni", "Mojito"], sem: ["Soda Italiana", "Piña Colada", "Limonada Suíça"] },
@@ -392,7 +418,12 @@ function menuHtml(e) {
 const MONTHS = ["janeiro","fevereiro","março","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"];
 const WDAYS = ["Domingo","Segunda","Terça","Quarta","Quinta","Sexta","Sábado"];
 const MIN = { y: 2026, m: 9 }, MAX = { y: 2026, m: 11 };
-let view = { y: 2026, m: 10 };
+const clampMonth = (y, m) => {
+  const v = y * 12 + m;
+  const c = Math.min(Math.max(v, MIN.y * 12 + MIN.m), MAX.y * 12 + MAX.m);
+  return { y: Math.floor(c / 12), m: c % 12 };
+};
+let view = clampMonth(new Date().getFullYear(), new Date().getMonth());
 let active = new Set(Object.keys(SPACES));
 let current = null, lastFocus = null;
 
@@ -406,14 +437,36 @@ const hour = t => { if (!t) return ""; const [h, m] = t.split(":").map(Number); 
 const dmy = s => { const p = parse(s); return pad(p.d) + "/" + pad(p.m + 1) + "/" + p.y; };
 const fmtGuests = e => e.guests + (e.staff ? " + " + e.staff + " staff" : "");
 
-function monthEvents() {
-  return EVENTS.filter(e => { const p = parse(e.date); return p.y === view.y && p.m === view.m; })
-    .sort((a, b) => a.date.localeCompare(b.date) || a.time.localeCompare(b.time));
-}
-const visible = () => monthEvents().filter(e => active.has(e.space));
+const ALL = EVENTS.slice().sort((a, b) => a.date.localeCompare(b.date) || a.time.localeCompare(b.time));
 
-function renderPills() {
-  const me = monthEvents();
+function monthEvents() {
+  return ALL.filter(e => { const p = parse(e.date); return p.y === view.y && p.m === view.m; });
+}
+
+function renderWeeks(ev) {
+  const sec = $("wk-sec");
+  const weeks = new Map();
+  ev.forEach(e => {
+    const p = parse(e.date), dt = new Date(p.y, p.m, p.d);
+    const start = new Date(p.y, p.m, p.d - dt.getDay());
+    const k = key(start.getFullYear(), start.getMonth(), start.getDate());
+    const w = weeks.get(k) || { start, n: 0, g: 0 };
+    w.n++; w.g += e.guests; weeks.set(k, w);
+  });
+  if (!weeks.size) { sec.hidden = true; return; }
+  const list = [...weeks.values()].sort((a, b) => a.start - b.start);
+  const max = Math.max(...list.map(w => w.g));
+  $("wk").innerHTML = list.map(w => {
+    const end = new Date(w.start.getFullYear(), w.start.getMonth(), w.start.getDate() + 6);
+    const f = d => pad(d.getDate()) + "/" + pad(d.getMonth() + 1);
+    const range = f(w.start) + " a " + f(end);
+    const txt = range + ": " + w.g.toLocaleString("pt-BR") + " convidados em " + w.n + (w.n === 1 ? " evento" : " eventos");
+    return `<div class="wkc" role="listitem" tabindex="0" title="${txt}" aria-label="${txt}"><div class="wkv">${w.g.toLocaleString("pt-BR")}</div><div class="wkp"><div class="wkb" style="height:${Math.max(2, Math.round(w.g / max * 100))}%"></div></div><div class="wkl">${f(w.start)}<br>a ${f(end)}</div></div>`;
+  }).join("");
+  sec.hidden = false;
+}
+
+function renderPills(me) {
   $("pills").innerHTML = Object.keys(SPACES).map(k => {
     const n = me.filter(e => e.space === k).length;
     return `<button class="pill" data-s="${k}" data-sp="${k}" aria-pressed="${active.has(k)}"><i></i>${SPACES[k]} <span>${n}</span></button>`;
@@ -425,9 +478,10 @@ function renderCal() {
   $("mlabel").textContent = MONTHS[m] + " " + y;
   $("prev").disabled = y === MIN.y && m === MIN.m;
   $("next").disabled = y === MAX.y && m === MAX.m;
-  renderPills();
+  const me = monthEvents();
+  renderPills(me);
 
-  const ev = visible();
+  const ev = me.filter(e => active.has(e.space));
   const by = {};
   ev.forEach(e => (by[e.date] = by[e.date] || []).push(e));
 
@@ -447,7 +501,7 @@ function renderCal() {
     }
     const k = key(y, m, d);
     const chips = (by[k] || []).map(e =>
-      `<button class="chip" data-s="${e.space}" data-id="${e.id}" title="${esc(e.name)}"><i></i><b>${hour(e.time)}</b><span class="nm">${esc(e.short)}</span><span class="g">${e.guests}</span></button>`).join("");
+      `<button class="chip" data-s="${e.space}" data-id="${e.id}" title="${esc(e.name)}"><i></i><span class="tx"><span class="top"><b>${hour(e.time) || "—"}</b><span class="g">${e.guests}</span></span><span class="nm">${esc(e.short)}</span></span></button>`).join("");
     html += `<div class="day${k === todayKey ? " today" : ""}"><span class="dn">${d}</span>${chips}</div>`;
   }
   $("cal").innerHTML = html;
@@ -466,18 +520,113 @@ function renderCal() {
   const sum = ev.reduce((a, e) => a + e.guests, 0);
   $("tot").innerHTML = `<b>${ev.length}</b> ${ev.length === 1 ? "evento" : "eventos"} · <b>${sum.toLocaleString("pt-BR")}</b> convidados`;
 
+  renderWeeks(ev);
+
   const empty = $("empty");
   if (!ev.length) {
     empty.hidden = false;
-    empty.textContent = monthEvents().length
+    empty.textContent = me.length
       ? "Nenhum evento nos espaços selecionados."
       : "Nenhum evento lançado em " + MONTHS[m] + ". Eles aparecem aqui quando entram no canal #planejamento-bartender.";
   } else empty.hidden = true;
 }
 
+/* Controle da equipe: guardado no db do artefato (coleção "controle", um documento por evento). */
+let DB = null, CAN_WRITE = true, CTL = {};
+const ctlTimer = {}, ctlQueue = {};
+
+function renderCtl(e) {
+  const wrap = $("ctl-wrap");
+  if (!wrap || !DB || !e) return;
+  const c = CTL[e.id] || {};
+  const ro = CAN_WRITE ? "" : " disabled";
+  wrap.dataset.ev = e.id;
+  wrap.innerHTML = `<div class="sec"><h4>Controle da equipe</h4><div class="ctl">
+    <label class="chk" for="ctl-cron"><input type="checkbox" id="ctl-cron"${c.cronograma ? " checked" : ""}${ro}> Cronograma recebido</label>
+    <label class="f" for="ctl-equipe">Equipe escalada<input type="text" id="ctl-equipe" maxlength="200" value="${esc(c.equipe || "")}"${ro}></label>
+    <label class="f" for="ctl-notas">Anotações<textarea id="ctl-notas" maxlength="1000"${ro}>${esc(c.notas || "")}</textarea></label>
+    <div class="st" id="ctl-st" aria-live="polite">${CAN_WRITE ? "" : "Somente leitura para o seu acesso."}</div></div></div>`;
+}
+
+const CTL_FIELDS = { cronograma: "ctl-cron", equipe: "ctl-equipe", notas: "ctl-notas" };
+
+function readCtl() {
+  const cron = $("ctl-cron"), eq = $("ctl-equipe"), nt = $("ctl-notas");
+  if (!cron || !eq || !nt) return null;
+  return { cronograma: cron.checked, equipe: eq.value.trim(), notas: nt.value.trim() };
+}
+
+function setCtlStatus(id, text) {
+  const s = $("ctl-st");
+  if (s && current && current.id === id) s.textContent = text;
+}
+
+function lockCtl() {
+  CAN_WRITE = false;
+  Object.values(CTL_FIELDS).forEach(i => { const el = $(i); if (el) el.disabled = true; });
+  const s = $("ctl-st");
+  if (s) s.textContent = "Não foi possível salvar. Seu acesso pode ser só de leitura.";
+}
+
+function saveCtl(id) {
+  clearTimeout(ctlTimer[id]); delete ctlTimer[id];
+  const w = $("ctl-wrap");
+  if (!DB || !CAN_WRITE || !current || current.id !== id || !w || Number(w.dataset.ev) !== id) return;
+  const data = readCtl();
+  if (!data) return;
+  const prev = CTL[id];
+  /* grava só os campos que mudaram, para não apagar a edição de outra pessoa nos demais */
+  const changed = {};
+  Object.keys(data).forEach(k => { if (!prev || data[k] !== (k === "cronograma" ? !!prev[k] : (prev[k] || ""))) changed[k] = data[k]; });
+  if (!Object.keys(changed).length) return;
+  setCtlStatus(id, "Salvando…");
+  const ref = DB.doc("controle/" + id);
+  ctlQueue[id] = (ctlQueue[id] || Promise.resolve())
+    .then(() => (prev ? ref.update(changed) : ref.set(data)))
+    .then(() => setCtlStatus(id, "Salvo"))
+    .catch(err => {
+      if (err && err.code === "invalid_argument") { if (current && current.id === id) lockCtl(); else CAN_WRITE = false; }
+      else setCtlStatus(id, "Não foi possível salvar. Tente de novo.");
+    });
+}
+
+function flushCtl() {
+  if (current && ctlTimer[current.id] !== undefined) saveCtl(current.id);
+}
+
+/* traz para os campos o que outra pessoa gravou, sem mexer no campo em que se está digitando */
+function syncCtl(e) {
+  const c = CTL[e.id] || {};
+  const at = document.activeElement;
+  const cron = $("ctl-cron"), eq = $("ctl-equipe"), nt = $("ctl-notas");
+  if (!cron || !eq || !nt) return;
+  if (cron !== at && cron.checked !== !!c.cronograma) cron.checked = !!c.cronograma;
+  if (eq !== at && eq.value !== (c.equipe || "")) eq.value = c.equipe || "";
+  if (nt !== at && nt.value !== (c.notas || "")) nt.value = c.notas || "";
+}
+
+async function initDb() {
+  try {
+    if (!window.claude || !window.claude.use) return;
+    const db = await window.claude.use("db");
+    if (!db) return;
+    const user = await window.claude.use("user");
+    if (user) { try { if ((await user.can("data.write")) === false) CAN_WRITE = false; } catch (_) {} }
+    DB = db;
+    db.collection("controle").onSnapshot(snap => {
+      const m = {};
+      snap.docs.forEach(d => { if (d.exists) m[d.id] = d.data(); });
+      CTL = m;
+      if (current) { if ($("ctl-wrap").contains(document.activeElement)) syncCtl(current); else renderCtl(current); }
+    }, () => {});
+    if (current) renderCtl(current);
+  } catch (_) { /* sem db: a página funciona só como consulta */ }
+}
+
 function openEvent(id, fromNav) {
   const e = EVENTS.find(x => x.id === id);
   if (!e) return;
+  flushCtl();
   current = e;
   if (!fromNav) lastFocus = document.activeElement;
   const sheet = $("sheet");
@@ -500,22 +649,29 @@ function openEvent(id, fromNav) {
     </dl>` +
     `<div class="sec"><h4>Observações</h4>${e.obs.length ? "<ul>" + e.obs.map(o => `<li>${esc(o)}</li>`).join("") + "</ul>" : "<p>Sem observações no post.</p>"}</div>` +
     menuHtml(e) +
+    `<div id="ctl-wrap"></div>` +
     `<div class="sec"><h4>Documentos no Slack</h4><div class="docs">${docs}</div></div>`;
   $("sh-body").scrollTop = 0;
-  const all = EVENTS.slice().sort((a, b2) => a.date.localeCompare(b2.date) || a.time.localeCompare(b2.time));
-  const i = all.findIndex(x => x.id === e.id);
+  renderCtl(e);
+  const i = ALL.indexOf(e);
   $("evprev").disabled = i <= 0;
-  $("evnext").disabled = i >= all.length - 1;
-  $("evprev").dataset.to = i > 0 ? all[i - 1].id : "";
-  $("evnext").dataset.to = i < all.length - 1 ? all[i + 1].id : "";
+  $("evnext").disabled = i >= ALL.length - 1;
+  $("evprev").dataset.to = i > 0 ? ALL[i - 1].id : "";
+  $("evnext").dataset.to = i < ALL.length - 1 ? ALL[i + 1].id : "";
   $("overlay").hidden = false;
+  document.documentElement.classList.add("lock");
   $("close").focus();
 }
 
 function closeEvent() {
+  flushCtl();
+  const id = current && current.id;
   $("overlay").hidden = true;
+  document.documentElement.classList.remove("lock");
   current = null;
-  if (lastFocus && document.contains(lastFocus)) lastFocus.focus();
+  if (lastFocus && document.contains(lastFocus)) { lastFocus.focus(); return; }
+  const back = id && document.querySelector('[data-id="' + id + '"]');
+  (back || $("next")).focus();
 }
 
 function shiftMonth(delta) {
@@ -534,11 +690,23 @@ $("pills").addEventListener("click", ev => {
   const k = b.dataset.sp;
   active.has(k) ? active.delete(k) : active.add(k);
   renderCal();
+  const nb = document.querySelector('[data-sp="' + k + '"]');
+  if (nb) nb.focus();
 });
 document.addEventListener("click", ev => {
   const t = ev.target.closest(".chip, .card");
   if (t && t.dataset.id) openEvent(Number(t.dataset.id));
 });
+/* os campos pertencem ao evento marcado em #ctl-wrap[data-ev], não ao evento aberto no momento */
+const ctlEvent = ev => { const w = ev.target.closest("#ctl-wrap"); return w && w.dataset.ev ? Number(w.dataset.ev) : null; };
+$("sh-body").addEventListener("input", ev => {
+  const id = ctlEvent(ev);
+  if (id === null) return;
+  clearTimeout(ctlTimer[id]);
+  ctlTimer[id] = setTimeout(() => saveCtl(id), 700);
+});
+$("sh-body").addEventListener("change", ev => { const id = ctlEvent(ev); if (id !== null) saveCtl(id); });
+$("sh-body").addEventListener("focusout", ev => { const id = ctlEvent(ev); if (id !== null) saveCtl(id); });
 $("close").addEventListener("click", closeEvent);
 $("scrim").addEventListener("click", closeEvent);
 ["evprev", "evnext"].forEach(id => $(id).addEventListener("click", ev => {
@@ -550,10 +718,19 @@ $("scrim").addEventListener("click", closeEvent);
   openEvent(e.id, true);
 }));
 document.addEventListener("keydown", ev => {
-  if (ev.key === "Escape" && !$("overlay").hidden) closeEvent();
+  if ($("overlay").hidden) return;
+  if (ev.key === "Escape") { closeEvent(); return; }
+  if (ev.key !== "Tab") return;
+  const f = [...$("sheet").querySelectorAll("button:not([disabled]), input:not([disabled]), textarea:not([disabled])")];
+  if (!f.length) return;
+  const first = f[0], last = f[f.length - 1], at = document.activeElement;
+  if (!$("sheet").contains(at)) { ev.preventDefault(); first.focus(); }
+  else if (ev.shiftKey && at === first) { ev.preventDefault(); last.focus(); }
+  else if (!ev.shiftKey && at === last) { ev.preventDefault(); first.focus(); }
 });
 
 renderCal();
+initDb();
 </script>
 </body>
 </html>
