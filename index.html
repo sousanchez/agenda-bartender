@@ -1,0 +1,559 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Agenda Bartender</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@500;600;700&family=Figtree:wght@400;500;600&display=swap">
+<style>
+/* Layout: calendário mensal (domingo a sábado) com chips por evento; abaixo de 720px vira lista por dia. Detalhe abre em painel lateral (desktop) ou folha inferior (celular). */
+:root {
+  --bg: #eff3f1;
+  --surface: #ffffff;
+  --surface2: #e6ece9;
+  --fg: #13211b;
+  --muted: #55665e;
+  --line: #d3dcd8;
+  --accent: #1d6a50;
+  --accent-fg: #ffffff;
+  --serra: #a96a12;   --serra-bg: #f6e7cb;
+  --acqua: #1d6aa3;   --acqua-bg: #d8e9f6;
+  --florest: #2b7a37; --florest-bg: #dbeedc;
+  --villa: #7448ab;   --villa-bg: #e8ddf4;
+  --warn: #9c3a12;    --warn-bg: #fbe6dc;
+  --scrim: rgba(10, 20, 15, 0.45);
+  --f-display: "Familjen Grotesk", "Helvetica Neue", Arial, sans-serif;
+  --f-body: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0d1511; --surface: #15201b; --surface2: #1e2c25; --fg: #e7efeb; --muted: #94a69d; --line: #2a3b33;
+    --accent: #5fc79f; --accent-fg: #0b1a13;
+    --serra: #e3a458; --serra-bg: #382a13;
+    --acqua: #74b3e8; --acqua-bg: #13304a;
+    --florest: #76cd82; --florest-bg: #16351b;
+    --villa: #bb9be8; --villa-bg: #2b1f40;
+    --warn: #f19a74; --warn-bg: #3e2015;
+    --scrim: rgba(0, 0, 0, 0.6);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0d1511; --surface: #15201b; --surface2: #1e2c25; --fg: #e7efeb; --muted: #94a69d; --line: #2a3b33;
+  --accent: #5fc79f; --accent-fg: #0b1a13;
+  --serra: #e3a458; --serra-bg: #382a13;
+  --acqua: #74b3e8; --acqua-bg: #13304a;
+  --florest: #76cd82; --florest-bg: #16351b;
+  --villa: #bb9be8; --villa-bg: #2b1f40;
+  --warn: #f19a74; --warn-bg: #3e2015;
+  --scrim: rgba(0, 0, 0, 0.6);
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font-family: var(--f-body); font-size: 15px; line-height: 1.45; }
+button { font: inherit; color: inherit; cursor: pointer; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+[data-s="serra"] { --c: var(--serra); --cbg: var(--serra-bg); }
+[data-s="acqua"] { --c: var(--acqua); --cbg: var(--acqua-bg); }
+[data-s="florest"] { --c: var(--florest); --cbg: var(--florest-bg); }
+[data-s="villa"] { --c: var(--villa); --cbg: var(--villa-bg); }
+
+.wrap {
+  max-width: 1180px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 24px 40px;
+}
+header.top { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px; margin-bottom: 18px; }
+h1 { font-family: var(--f-display); font-weight: 700; font-size: clamp(26px, 4vw, 36px); letter-spacing: -0.02em; margin: 0; line-height: 1.05; text-wrap: balance; }
+.sub { color: var(--muted); margin: 6px 0 0; }
+.nav { display: flex; align-items: center; gap: 8px; }
+.nav h2 { font-family: var(--f-display); font-size: 20px; font-weight: 600; margin: 0; min-width: 11ch; text-align: center; text-transform: capitalize; }
+.icon-btn { width: 40px; height: 40px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); display: grid; place-items: center; font-size: 18px; }
+.icon-btn:disabled { opacity: 0.35; cursor: default; }
+
+.bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+.tot { font-variant-numeric: tabular-nums; color: var(--muted); }
+.tot b { color: var(--fg); font-weight: 600; }
+.pills { display: flex; flex-wrap: wrap; gap: 8px; }
+.pill { display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); font-size: 14px; }
+.pill i { width: 10px; height: 10px; border-radius: 50%; background: var(--c); }
+.pill[aria-pressed="false"] { opacity: 0.45; }
+.pill[aria-pressed="false"] i { background: transparent; box-shadow: inset 0 0 0 2px var(--c); }
+.pill span { color: var(--muted); font-variant-numeric: tabular-nums; }
+
+.cal { background: var(--line); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 1px; }
+.wd { background: var(--surface2); padding: 8px 10px; font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.day { background: var(--surface); min-height: 118px; padding: 6px; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.day.out { background: var(--bg); }
+.day.out .dn { opacity: 0.4; }
+.dn { font-family: var(--f-display); font-weight: 600; font-size: 14px; width: 26px; height: 26px; display: grid; place-items: center; border-radius: 50%; font-variant-numeric: tabular-nums; }
+.day.today .dn { background: var(--accent); color: var(--accent-fg); }
+.chip { display: flex; align-items: center; gap: 6px; width: 100%; min-width: 0; text-align: left; padding: 4px 6px; border: 0; border-radius: 7px; background: var(--cbg); font-size: 12.5px; line-height: 1.25; }
+.chip i { flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--c); }
+.chip b { flex: none; font-weight: 600; font-variant-numeric: tabular-nums; }
+.chip .nm { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.chip .g { flex: none; color: var(--muted); font-variant-numeric: tabular-nums; }
+.chip:hover { filter: brightness(0.96); }
+
+.agenda { display: none; flex-direction: column; gap: 14px; }
+.ag-day { display: grid; grid-template-columns: 52px minmax(0, 1fr); gap: 12px; }
+.ag-date { text-align: center; padding-top: 4px; }
+.ag-date b { display: block; font-family: var(--f-display); font-size: 26px; line-height: 1; font-variant-numeric: tabular-nums; }
+.ag-date span { font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+.ag-list { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.card { text-align: left; width: 100%; border: 1px solid var(--line); background: var(--surface); border-radius: 12px; padding: 10px 12px; display: grid; gap: 4px; }
+.card .r1 { display: flex; justify-content: space-between; gap: 8px; font-size: 13px; color: var(--muted); }
+.card .r1 em { font-style: normal; display: inline-flex; align-items: center; gap: 6px; color: var(--fg); font-weight: 600; }
+.card .r1 em i { width: 9px; height: 9px; border-radius: 50%; background: var(--c); }
+.card .nm { font-weight: 600; overflow-wrap: anywhere; }
+.card .r3 { font-size: 13px; color: var(--muted); }
+.empty { padding: 28px 16px; text-align: center; color: var(--muted); background: var(--surface); border: 1px dashed var(--line); border-radius: 14px; margin-top: 14px; }
+
+.foot { margin-top: 18px; color: var(--muted); font-size: 13px; max-width: 70ch; }
+
+#overlay { position: fixed; inset: 0; z-index: 20; }
+.scrim { position: absolute; inset: 0; background: var(--scrim); }
+.sheet { position: absolute; top: 0; right: 0; bottom: 0; width: min(460px, 100%); background: var(--surface); border-left: 1px solid var(--line); display: flex; flex-direction: column; }
+.sh-head { padding: 18px 20px 14px; padding-top: max(18px, env(safe-area-inset-top, 0px)); border-bottom: 1px solid var(--line); background: var(--cbg); }
+.sh-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+.sp-tag { display: inline-flex; align-items: center; gap: 8px; font-weight: 600; font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; }
+.sp-tag i { width: 10px; height: 10px; border-radius: 50%; background: var(--c); }
+.sh-head h3 { font-family: var(--f-display); font-size: 24px; line-height: 1.15; margin: 0; font-weight: 700; letter-spacing: -0.01em; text-wrap: balance; overflow-wrap: anywhere; }
+.sh-head p { margin: 4px 0 0; color: var(--muted); }
+.sh-body { padding: 16px 20px; overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 18px; min-height: 0; }
+.facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 16px; margin: 0; }
+.facts div { min-width: 0; }
+.facts dt { font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+.facts dd { margin: 2px 0 0; font-weight: 600; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.facts .wide { grid-column: 1 / -1; }
+.badge { display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 13px; font-weight: 600; background: var(--surface2); }
+.badge.ok { background: var(--florest-bg); color: var(--florest); }
+.badge.na { background: var(--acqua-bg); color: var(--acqua); }
+.badge.nd { background: var(--warn-bg); color: var(--warn); }
+.sec h4 { font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin: 0 0 8px; font-weight: 600; }
+.sec ul { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 4px; }
+.docs { display: flex; flex-wrap: wrap; gap: 6px; }
+.doc { padding: 4px 10px; border-radius: 8px; border: 1px solid var(--line); font-size: 13px; background: var(--bg); }
+.doc.miss { border-style: dashed; color: var(--warn); }
+.muted { color: var(--muted); margin: 0; }
+.mn { margin-top: 12px; }
+.mn:first-of-type { margin-top: 0; }
+.mn h5 { margin: 0 0 6px; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+.mn h5 span { font-size: 12px; font-weight: 500; color: var(--muted); font-variant-numeric: tabular-nums; }
+.menu { list-style: none !important; padding-left: 0 !important; display: grid !important; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 6px !important; }
+.menu li { position: relative; padding: 6px 10px 6px 24px; border-radius: 8px; background: var(--bg); border: 1px solid var(--line); font-size: 14px; overflow-wrap: anywhere; }
+.menu li::before { content: ""; position: absolute; left: 10px; top: 13px; width: 7px; height: 7px; border-radius: 50%; background: var(--c); }
+.mn.sem li::before { background: transparent; box-shadow: inset 0 0 0 2px var(--c); }
+.mn.extra li::before { border-radius: 2px; background: var(--muted); }
+.alert { background: var(--warn-bg); color: var(--warn); border-radius: 10px; padding: 10px 12px; font-size: 14px; font-weight: 500; }
+.sh-foot { display: flex; justify-content: space-between; gap: 8px; padding: 12px 20px; padding-bottom: max(12px, env(safe-area-inset-bottom, 0px)); border-top: 1px solid var(--line); }
+.btn { padding: 8px 14px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); font-weight: 500; }
+.btn:disabled { opacity: 0.35; cursor: default; }
+
+@media (max-width: 720px) {
+  .cal { display: none; }
+  .agenda { display: flex; }
+  .sheet { top: auto; left: 0; max-height: 90%; border-left: 0; border-top: 1px solid var(--line); border-radius: 18px 18px 0 0; }
+  .sh-head { border-radius: 18px 18px 0 0; padding-top: 18px; }
+  .nav { width: 100%; justify-content: space-between; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .sheet { animation: slide 0.18s ease-out; }
+  @keyframes slide { from { transform: translateX(24px); opacity: 0; } to { transform: none; opacity: 1; } }
+  @media (max-width: 720px) { @keyframes slide { from { transform: translateY(24px); opacity: 0; } to { transform: none; opacity: 1; } } }
+}
+
+html { color-scheme: light; }
+body { margin: 0; }
+[hidden] { display: none !important; }
+img { max-width: 100%; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1>Agenda Bartender</h1>
+      <p class="sub">Eventos confirmados no #planejamento-bartender. Toque num evento para ver tudo dele.</p>
+    </div>
+    <div class="nav">
+      <button class="icon-btn" id="prev" aria-label="Mês anterior">‹</button>
+      <h2 id="mlabel" aria-live="polite"></h2>
+      <button class="icon-btn" id="next" aria-label="Próximo mês">›</button>
+    </div>
+  </header>
+
+  <div class="bar">
+    <div class="pills" id="pills" role="group" aria-label="Filtrar por espaço"></div>
+    <div class="tot" id="tot"></div>
+  </div>
+
+  <div class="cal" id="cal" aria-label="Calendário do mês"></div>
+  <div class="agenda" id="agenda"></div>
+  <div class="empty" id="empty" hidden></div>
+
+  <p class="foot">Fonte: posts do canal até 23/10/2026. Os cardápios de drinks vêm dos PDFs de Bartender anexados no Slack. Convidados não incluem staff.</p>
+</div>
+
+<div id="overlay" hidden>
+  <div class="scrim" id="scrim"></div>
+  <aside class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sh-title">
+    <div class="sh-head">
+      <div class="sh-top">
+        <span class="sp-tag"><i></i><span id="sh-space"></span></span>
+        <button class="icon-btn" id="close" aria-label="Fechar">✕</button>
+      </div>
+      <h3 id="sh-title"></h3>
+      <p id="sh-date"></p>
+    </div>
+    <div class="sh-body" id="sh-body"></div>
+    <div class="sh-foot">
+      <button class="btn" id="evprev">‹ Anterior</button>
+      <button class="btn" id="evnext">Próximo ›</button>
+    </div>
+  </aside>
+</div>
+
+<script>
+const SPACES = { serra: "Serra", acqua: "Acqua", florest: "Florest", villa: "Villa do Vale" };
+const BAR = {
+  cs:  { t: "Com e sem álcool", k: "ok" },
+  so:  { t: "Só sem álcool", k: "na" },
+  sim: { t: "Tem bar", k: "ok" },
+  nd:  { t: "Bar não informado", k: "nd" }
+};
+const BARTENDER = "Bartender (PDF)", CRONO = "Cronograma (PDF)";
+const EVENTS = [
+  { id: 1, date: "2026-11-04", space: "serra", name: "William Wagner Meescyzyn e Caroline", short: "William e Caroline", time: "16:30", guests: 90, tables: "16 + staff", party: "6h de festa", bar: "sim",
+    obs: ["Terá chope", "Pequia/barca com 10 espumantes", "Torre de taças com 30 taças, montada na vilinha do Serra (o brinde será lá)"], docs: [BARTENDER, CRONO] },
+  { id: 2, date: "2026-11-05", space: "serra", name: "José Carlos Hesberg Filho e Elaine", short: "José Carlos e Elaine", time: "18:00", guests: 160, tables: "Não informado", party: "Não informado", bar: "nd",
+    obs: [], docs: [], alerts: ["Briefing incompleto: o post diz que será atualizado em breve. Sem PDF de Bartender nem cronograma."] },
+  { id: 3, date: "2026-11-06", space: "serra", name: "Debutante Micaela (Auro Marcelo Bonequini)", short: "Debutante Micaela", time: "18:30", guests: 140, tables: "19 + staff", party: "6h de festa", bar: "so",
+    obs: ["Festa de debutante", "Bar sem álcool"], docs: [BARTENDER, CRONO] },
+  { id: 4, date: "2026-11-06", space: "acqua", name: "Rene Denofrio Manzano e Danielly", short: "Rene e Danielly", time: "16:30", guests: 140, tables: "Não informado", party: "6h de festa", bar: "cs",
+    obs: ["Terá chopp"], docs: [BARTENDER, CRONO] },
+  { id: 5, date: "2026-11-07", space: "serra", name: "Savio Oliveira Pinheiro e Karina", short: "Savio e Karina", time: "14:30", guests: 170, tables: "24 + mesa dos noivos", party: "6h de festa", bar: "cs",
+    obs: ["Cerimônia na igreja", "Long neck", "Torre de taças montada na Capela do Serra"], docs: [BARTENDER], alerts: ["Cronograma do evento não localizado no Slack."] },
+  { id: 6, date: "2026-11-07", space: "acqua", name: "Gilmara Borges de Moraes e Natan", short: "Gilmara e Natan", time: "16:00", guests: 120, tables: "16 + mesa da família + mesa dos noivos", party: "6h de festa", bar: "sim",
+    obs: ["Open de chopp Brahma", "Taxa rolha para vinho e espumante"], docs: [BARTENDER, CRONO] },
+  { id: 7, date: "2026-11-07", space: "florest", name: "Anderson Faverani (Kathleen e Marcelo)", short: "Anderson Faverani", time: "18:00", guests: 200, tables: "22", party: "Não informado", bar: "cs",
+    obs: ["Carrinho de chopp"], docs: [BARTENDER, CRONO], alerts: ["Data corrigida: o post dizia 08/11 e foi atualizado para 07/11."] },
+  { id: 8, date: "2026-11-08", space: "acqua", name: "Marina Borges Ramos e Rodrigo", short: "Marina e Rodrigo", time: "15:30", guests: 128, tables: "16 + mesa da família + mesa dos noivos", party: "6h de festa", bar: "sim",
+    obs: ["Chopp pilsen para os 128 convidados"], docs: [BARTENDER, "Bebidas (PDF)", CRONO] },
+  { id: 9, date: "2026-11-13", space: "serra", name: "Antônio de Oliveira de Sousa e Poliana", short: "Antônio e Poliana", time: "16:00", guests: 100, tables: "13", party: "Não informado", bar: "sim",
+    obs: ["Post sem observações. Cardápio no PDF de Bartender."], docs: [BARTENDER, CRONO] },
+  { id: 10, date: "2026-11-14", space: "serra", name: "Erika Lima Fernandes da Silva e Gabriel", short: "Erika e Gabriel", time: "15:30", guests: 105, tables: "19", party: "6h de festa", bar: "sim",
+    obs: ["Ponto extra do bar ao lado da Capella (igual na inauguração do Serra)", "Árvore de limão siciliano com bar ilha no salão", "Upgrade de vodka", "Gin com limão taiti", "Torre de taças", "Open de long neck Heineken e Stella"], docs: [BARTENDER, CRONO, "Foto de referência"] },
+  { id: 11, date: "2026-11-14", space: "acqua", name: "David Kwang Won Lee e Gabriele", short: "David e Gabriele", time: "15:30", guests: 100, tables: "17 + mesa dos noivos", party: "7h de festa", bar: "cs",
+    obs: ["Carrinho de chopp", "Perfil da festa muito animado"], docs: [BARTENDER, CRONO] },
+  { id: 12, date: "2026-11-14", space: "florest", name: "Lucas Silveira Jardim e Tamires", short: "Lucas e Tamires", time: "17:00", guests: 110, tables: "Não informado", party: "Não informado", bar: "cs",
+    obs: ["Fornecedor: Brahma (chopp Brahma)", "1 bartender extra", "Noivo vai trazer muitas bebidas", "Convidados bebem bastante, principalmente os noivos"], docs: [BARTENDER, CRONO] },
+  { id: 13, date: "2026-11-15", space: "florest", name: "Paulo Henrique Santana Silva e Laura", short: "Paulo Henrique e Laura", time: "11:00", guests: 200, tables: "24 + mesa dos noivos", party: "Não informado", bar: "so",
+    obs: ["Bar sem álcool"], docs: [BARTENDER, CRONO] },
+  { id: 14, date: "2026-11-15", space: "serra", name: "Rebeca Victoria Rodrigues dos Santos e Juliano", short: "Rebeca e Juliano", time: "16:00", guests: 92, staff: 13, tables: "13", party: "6h de festa", bar: "so",
+    obs: ["Festa evangélica", "Bar somente sem álcool", "Na degustação a noiva pediu copos mais elaborados para os drinks, pois não gostou do long. Seguir apenas se houver disponível."], docs: [BARTENDER, CRONO, "Foto de referência"] },
+
+  /* Outubro (e 01/11) */
+  { id: 15, date: "2026-10-02", space: "florest", name: "Rodolfo Santana Binatto e Sheila", short: "Rodolfo e Sheila", time: "17:00", guests: 160, tables: "22", party: "Não informado", bar: "cs",
+    obs: ["Terá chope", "O casal leva garapa; a Sandra ficou de definir um drink com ela", "Adoçante para convidados diabéticos, se pedirem"], docs: [BARTENDER, CRONO] },
+  { id: 16, date: "2026-10-02", space: "serra", name: "Matheus Éverton da Graça Porzelt e Daisy", short: "Matheus e Daisy", time: "", guests: 120, tables: "Não informado", party: "Não informado", bar: "sim",
+    obs: ["Bar externo", "Torre de taças com 30 taças para o brinde (a estrutura é do bar)"], docs: [CRONO] },
+  { id: 17, date: "2026-10-03", space: "serra", name: "Julia Lotti Mietto e Leonardo", short: "Julia e Leonardo", time: "17:00", guests: 180, tables: "23", party: "6h de festa", bar: "cs",
+    obs: ["Chopp Brahma open"], docs: [BARTENDER] },
+  { id: 18, date: "2026-10-03", space: "florest", name: "Rafael Kuramoto e Thaila", short: "Rafael e Thaila", time: "17:00", guests: 100, tables: "13", party: "6h de festa", bar: "cs",
+    obs: ["Terá chopp"], docs: [BARTENDER, CRONO] },
+  { id: 19, date: "2026-10-03", space: "acqua", name: "Renan Ciccone Rodrigues Alves e Nicole", short: "Renan e Nicole", time: "16:00", guests: 250, tables: "23 + mesa da família", party: "9h de festa", bar: "cs",
+    obs: ["Os noivos trazem: chopp (carrinho + 3 bistrôs), vinho branco e tinto (taxa rolha), espumante + taças, long neck, whisky, shot de Dom Luiz e Baermate long neck"], docs: [BARTENDER, CRONO, "Bebidas (PDF)"] },
+  { id: 20, date: "2026-10-04", space: "serra", name: "Laura Barbosa Roncon e Victor", short: "Laura e Victor", time: "16:00", guests: 140, tables: "20", party: "Não informado", bar: "cs",
+    obs: ["Chopp Brahma open"], docs: [BARTENDER] },
+  { id: 21, date: "2026-10-04", space: "florest", name: "Andressa Borges Veloso de Sousa e Lucas Rocha da Silva Xavier", short: "Andressa e Lucas", time: "14:30", guests: 120, tables: "18", party: "Não informado", bar: "cs",
+    obs: ["Terá chope"], docs: [BARTENDER] },
+  { id: 22, date: "2026-10-10", space: "serra", name: "Marcela Barbara Umeno e Marcos", short: "Marcela e Marcos", time: "15:30", guests: 144, tables: "22", party: "Não informado", bar: "cs",
+    obs: ["Terá chope"], docs: [BARTENDER, CRONO] },
+  { id: 23, date: "2026-10-10", space: "acqua", name: "Ricardo Maia dos Santos Junior e Isabella Vivianne", short: "Ricardo e Isabella", time: "15:30", guests: 190, tables: "20 + mesa dos noivos", party: "Não informado", bar: "so",
+    obs: ["Casamento religioso", "Bar sem álcool"], docs: [BARTENDER, CRONO], alerts: ["Convidados atualizados de 250 para 190 em 29/09."] },
+  { id: 24, date: "2026-10-10", space: "florest", name: "Bianca Ambrosio Freire e Pedro", short: "Bianca e Pedro", time: "17:30", guests: 180, tables: "22", party: "6h de festa", bar: "cs",
+    obs: ["Chopp Pilsen artesanal + 1 ponto de chopp extra"], docs: [BARTENDER, CRONO] },
+  { id: 25, date: "2026-10-11", space: "acqua", name: "Luiz Fernando Tecendi Cardoso e Gabriela", short: "Luiz e Gabriela", time: "15:30", guests: 200, tables: "26", party: "7h de festa", bar: "cs",
+    obs: ["Open de chopp"], docs: [BARTENDER] },
+  { id: 26, date: "2026-10-11", space: "florest", name: "Bruno Pessini Favero e Beatriz", short: "Bruno e Beatriz", time: "17:00", guests: 108, tables: "14", party: "6h de festa", bar: "cs",
+    obs: ["Cerveja long neck premium", "Os noivos trazem garrafas de whisky e pedem alguns copos"], docs: [BARTENDER] },
+  { id: 27, date: "2026-10-17", space: "villa", name: "Ana Lucia Moraes Campos", short: "Ana Lucia", time: "14:00", guests: 80, tables: "Não informado", party: "Não informado", bar: "cs",
+    obs: ["Bar com e sem álcool"], docs: [BARTENDER] },
+  { id: 28, date: "2026-10-17", space: "serra", name: "Fernando Candido Silva e Mariana", short: "Fernando e Mariana", time: "16:00", guests: 100, tables: "17", party: "Não informado", bar: "cs",
+    obs: ["Chope Brahma Pilsen para 100 contratados"], docs: [BARTENDER, CRONO] },
+  { id: 29, date: "2026-10-17", space: "florest", name: "Juliano Marquesin Toresin e Jessica", short: "Juliano e Jessica", time: "17:30", guests: 140, tables: "19", party: "Não informado", bar: "cs",
+    obs: ["Carrinho de chopp"], docs: [BARTENDER] },
+  { id: 30, date: "2026-10-17", space: "acqua", name: "Ricardo Maia de Paiva e Priscilla", short: "Ricardo e Priscilla", time: "16:00", guests: 180, tables: "28", party: "Não informado", bar: "cs",
+    obs: ["Torre de taças com 50 taças", "Terá chope", "Terá vinho e espumante"], docs: [BARTENDER, CRONO] },
+  { id: 31, date: "2026-10-18", space: "serra", name: "Raphael Claro e Ana Clara Loureiro Cesar", short: "Raphael e Ana Clara", time: "14:00", guests: 85, tables: "12", party: "Não informado", bar: "so",
+    obs: ["Bar sem álcool"], docs: [BARTENDER] },
+  { id: 32, date: "2026-10-18", space: "acqua", name: "Lucas Joaquim da Silva e Mayane", short: "Lucas e Mayane", time: "13:30", guests: 142, tables: "20 + mesa dos noivos", party: "6h de festa", bar: "cs",
+    obs: ["Chopp artesanal open"], docs: [BARTENDER] },
+  { id: 33, date: "2026-10-23", space: "serra", name: "Yane Mendes dos Santos e Marcos", short: "Yane e Marcos", time: "20:00", guests: 120, tables: "16", party: "Não informado", bar: "cs",
+    obs: ["Carrinho de chopp", "Os noivos trazem vinho e whisky"], docs: [BARTENDER, CRONO] },
+  { id: 34, date: "2026-10-23", space: "acqua", name: "Felippe Viana Queiroga de Oliveira e Ana Carolina", short: "Felippe e Ana Carolina", time: "16:30", guests: 140, tables: "20", party: "Não informado", bar: "cs",
+    obs: ["Carrinho de chopp"], docs: [BARTENDER] },
+  { id: 35, date: "2026-10-24", space: "acqua", name: "Isabela Lima Silva e Felipe", short: "Isabela e Felipe", time: "15:00", guests: 120, tables: "14 + staff", party: "6h de festa", bar: "cs",
+    obs: ["Carrinho de chopp"], docs: [BARTENDER, CRONO] },
+  { id: 36, date: "2026-10-24", space: "florest", name: "Nicolas Aguiar Meneses e Rayssa", short: "Nicolas e Rayssa", time: "17:00", guests: 100, tables: "Não informado", party: "6h de festa", bar: "so",
+    obs: ["Bar sem álcool"], docs: [BARTENDER, CRONO] },
+  { id: 37, date: "2026-10-24", space: "serra", name: "Enpasa Eng Pav e San Ltda", short: "Enpasa", time: "12:30", guests: 240, tables: "Não informado", party: "8h de festa", bar: "cs",
+    obs: ["Cerveja long neck"], docs: [BARTENDER] },
+  { id: 38, date: "2026-10-25", space: "acqua", name: "Luyan Gustavo da Silva Pereira e Bruna", short: "Luyan e Bruna", time: "15:00", guests: 95, tables: "13", party: "6h de festa", bar: "so",
+    obs: ["Bar sem álcool"], docs: [BARTENDER] },
+  { id: 39, date: "2026-10-30", space: "acqua", name: "Rodrigo Castaldoni Jandreice e Bruna", short: "Rodrigo e Bruna", time: "15:30", guests: 100, tables: "15", party: "7h de festa", bar: "cs",
+    obs: ["Open chopp Brahma", "Taxa rolha: vinho, espumante e bebidas de shot", "O noivo traz os copos de whisky", "Fitzgerald para o noivo"], docs: [BARTENDER, CRONO] },
+  { id: 40, date: "2026-10-31", space: "florest", name: "Rafael Coraini e Bruna", short: "Rafael e Bruna", time: "13:00", guests: 75, tables: "13 (mesa 1 é a da família)", party: "6h de festa", bar: "cs",
+    obs: ["Terá chopp"], docs: [BARTENDER, CRONO] },
+  { id: 41, date: "2026-10-31", space: "acqua", name: "Joyce dos Santos de Melo e Celso", short: "Joyce e Celso", time: "15:30", guests: 120, tables: "17 + mesa da família", party: "7h de festa", bar: "cs",
+    obs: ["Terá chopp", "O noivo traz pequenas quantidades de whisky para deixar ponto no bar e contratou 30 copos de whisky"], docs: [BARTENDER, CRONO], alerts: ["Convidados corrigidos de 140 para 120."] },
+  { id: 42, date: "2026-10-31", space: "serra", name: "Ana Paula de Melo Sousa Witeck e Jordano Fontana Witeck", short: "Ana Paula e Jordano", time: "16:30", guests: 170, tables: "19 + mesa da família", party: "8h de festa", bar: "cs",
+    obs: ["Open chopp artesanal Giffa", "Torre de taças com 50 unidades", "Taxa rolha"], docs: [BARTENDER], alerts: ["Convidados atualizados de 100 para 170 em 20/10. Ponto de atenção do PDF: verificar se pode ter o consumo puro (sem resposta no Slack)."] },
+  { id: 43, date: "2026-11-01", space: "florest", name: "Mariana Santos Ribeiro Lima e Alessio", short: "Mariana e Alessio", time: "15:00", guests: 200, tables: "24 + mesa dos noivos", party: "6h de festa", bar: "cs",
+    obs: ["Convite às 15h, na igreja", "120 litros de chope Brahma"], docs: [BARTENDER], alerts: ["Cronograma do evento não localizado no Slack."] },
+  { id: 44, date: "2026-11-01", space: "acqua", name: "Juliana Paixão Dall Agnol Bento e Matheus", short: "Juliana e Matheus", time: "15:30", guests: 215, tables: "26 + staff", party: "6h de festa", bar: "cs",
+    obs: ["Long neck"], docs: [BARTENDER], alerts: ["Cronograma do evento não localizado no Slack."] },
+  { id: 45, date: "2026-11-01", space: "serra", name: "Carlos Camillo Nava e Catharina", short: "Carlos e Catharina", time: "16:30", guests: 250, tables: "33", party: "6h de festa", bar: "cs",
+    obs: ["Long neck", "Taxa rolha"], docs: [BARTENDER, CRONO] }
+];
+
+/* Cardápios conforme os PDFs de Bartender de cada evento. Sem PDF = sem cardápio. */
+const SEM4 = ["Moranguinho", "Piña Colada", "Limonada Suíça", "Mix de Maracujá"];
+const COM11 = ["Caipirinha", "Caipiroska", "Saquêrinhas", "Espanhola", "Sex on the Beach", "Gin Tônica", "Mojito", "Aperol Spritz", "Moscow Mule", "Negroni", "Lagoa Azul"];
+const SEM9 = ["Moranguinho", "Piña Colada", "Limonada Suíça", "Mix de Maracujá", "Sex on the Beach", "Banana Mix", "Tropical de Frutas", "Gostinho de Infância", "Melancia"];
+const SEM10 = [...SEM9, "Kiwi Kiss"];
+const DRINKS = {
+  1: { com: ["Caipirinha (cachaça Salinas ou equivalente)", "Caipiroska (vodka Smirnoff ou equivalente)", "Saquêrinhas (saquê Fuji e/ou Sakeih ou equivalente)", "Gin Tônica (gin Tanqueray)", "Mojito", "Aperol Spritz", "Moscow Mule", "Cosmopolitan", "Limoncello (drink especial/autoral)"], sem: SEM4 },
+  3: { com: [], sem: ["Moranguinho", "Piña Colada", "Limonada Suíça", "Mix de Maracujá", "Sex on the Beach", "Banana Mix", "Tropical de Frutas", "Gostinho de Infância", "Melancia"] },
+  4: { com: COM11, sem: SEM4 },
+  5: { com: ["Caipirinha", "Caipiroska", "Saquêrinhas", "Sex on the Beach", "Gin Tônica", "Mango Passion", "Aperol Spritz", "Moscow Mule", "Negroni", "Lagoa Azul", "Limoncello Spritz"], sem: SEM4 },
+  6: { com: COM11, sem: SEM4 },
+  7: { com: COM11, sem: SEM4 },
+  8: { com: ["Caipirinha", "Caipiroska", "Saquêrinhas", "Gin Tônica", "Mojito", "Aperol Spritz", "Moscow Mule", "Negroni", "Limoncello Spritz"], sem: ["Piña Colada", "Limonada Suíça", "Soda Italiana"],
+        extra: ["Bebidas (PDF): chopp pilsen artesanal, incluso, servido em carrinho, para 128 convidados"] },
+  9: { com: ["Caipirinha (pinga Salinas)", "Caipiroska (vodka Smirnoff)", "Saquêrinhas (saquê Fuji e Sakeih)", "Espanhola (vinho)", "Sex on the Beach", "Gin Tônica (gin Tanqueray)", "Mojito", "Aperol Spritz", "Moscow Mule", "Negroni", "Lagoa Azul"], sem: SEM4 },
+  10: { com: ["Caipirinha", "Caipiroska (com upgrade de vodka Absolut)", "Saquêrinhas", "Espanhola", "Sex on the Beach", "Gin Tônica (com limão taiti)", "Mojito", "Aperol Spritz", "Moscow Mule", "Negroni", "Lagoa Azul"], sem: SEM4,
+        extra: ["Ponto extra de bar ao lado da Capella", "Árvore de limão siciliano no centro do bar", "Torre de taças (30 unidades)", "Upgrade de vodka Absolut"] },
+  11: { com: COM11, sem: SEM4 },
+  12: { com: [...COM11, "Mango Passion (os noivos gostam bastante; cuidado para não deixar aguado)"], sem: SEM4 },
+  13: { com: [], sem: ["Moranguinho", "Piña Colada", "Limonada Suíça", "Mix de Maracujá", "Sex on the Beach", "Banana Mix", "Tropical de Frutas", "Gostinho de Infância", "Melancia", "Kiwi Kiss"] },
+  14: { com: [], sem: ["Moranguinho", "Piña Colada", "Limonada Suíça", "Mix de Maracujá", "Sex on the Beach", "Tropical de Frutas", "Mango Passion (sem álcool)", "Moscow Mule (sem álcool)"],
+        extra: ["Copos mais elaborados para os drinks, se houver disponível"] },
+
+  /* Outubro (e 01/11) */
+  15: { com: COM11, sem: SEM4, extra: ["Garapa trazida pelo casal (drink a definir)"] },
+  17: { com: ["Caipirinha", "Caipiroska", "Saquêrinhas", "Limoncello Spritz", "Sex on the Beach", "Gin Tônica", "Mojito", "Aperol Spritz", "Moscow Mule", "Negroni", "Lagoa Azul"], sem: SEM4 },
+  18: { com: ["Caipirinha", "Caipiroska", "Saquêrinhas", "Gin Tônica", "Mojito", "Aperol Spritz", "Moscow Mule", "Negroni"], sem: SEM4 },
+  19: { com: ["Caipiroska", "Aperol Spritz", "Gin Tônica (Tanqueray)", "Fitzgerald", "Moscow Mule", "Negroni", "Mango Passion", "Penicilin", "Bramble"], sem: ["Soda Italiana"] },
+  20: { com: COM11, sem: SEM4 },
+  21: { com: ["Caipiroska", "Saquêrinhas", "Sex on the Beach", "Gin Tônica", "Mojito", "Aperol Spritz", "Moscow Mule", "Mango Passion", "Limoncello Spritz"], sem: SEM4 },
+  22: { com: ["Caipirinha", "Caipiroska", "Saquêrinhas", "Moscow Mule"], sem: ["Moranguinho", "Piña Colada"] },
+  23: { com: [], sem: SEM10 },
+  24: { com: ["Caipirinha (pinga Salinas)", "Caipiroska (vodka Smirnoff)", "Saquêrinhas (saquê Fuji e Sakeih)", "Espanhola (vinho)", "Lagoa Azul", "Sex on the Beach", "Mojito", "Gin Tônica (gin Tanqueray)", "Aperol Spritz", "Moscow Mule", "Negroni"], sem: SEM4 },
+  25: { com: ["Caipirinha", "Caipiroska", "Saquêrinhas", "Sex on the Beach", "Gin Tônica", "Mojito", "Aperol Spritz", "Moscow Mule", "Negroni"], sem: SEM4 },
+  26: { com: ["Caipirinha (pinga Salinas)", "Caipiroska (vodka Smirnoff)", "Saquêrinhas (saquê Fuji e Sakeih)", "Espanhola (vinho)", "Lagoa Azul", "Sex on the Beach", "Mojito", "Gin Tônica (gin Tanqueray)", "Aperol Spritz", "Moscow Mule", "Negroni"], sem: SEM4 },
+  27: { com: COM11, sem: SEM4 },
+  28: { com: ["Caipirinha (pinga Salinas)", "Caipiroska (vodka Smirnoff)", "Saquêrinhas (saquê Fuji e Sakeih)", "Piña Colada com álcool", "Sex on the Beach", "Gin Tônica (gin Tanqueray)", "Mojito", "Aperol Spritz", "Moscow Mule", "Negroni", "Limoncello Spritz"], sem: SEM4 },
+  29: { com: ["Caipirinha", "Caipiroska", "Saquêrinhas", "Aperol Spritz", "Gin Tônica", "Limoncello Spritz", "Moscow Mule", "Negroni", "Mojito"], sem: ["Soda Italiana", "Piña Colada", "Limonada Suíça"] },
+  30: { com: ["Caipirinha", "Caipiroska", "Saquêrinhas", "Gin Tônica", "Mojito", "Aperol Spritz", "Moscow Mule", "Negroni"], sem: SEM4, extra: ["Torre de taças (50 taças)"] },
+  31: { com: [], sem: SEM9 },
+  32: { com: ["Caipirinha", "Caipiroska", "Espanhola", "Sex on the Beach", "Lagoa Azul", "Mojito", "Aperol Spritz", "Moscow Mule", "Negroni"], sem: SEM4 },
+  33: { com: ["Caipirinha (cachaça Salinas ou equivalente)", "Caipiroska (vodka Smirnoff ou equivalente)", "Saquêrinhas (saquê Fuji e/ou Sakeih ou equivalente)", "Aperol Spritz", "Gin Tônica (gin Tanqueray)", "Moscow Mule", "Negroni", "Limoncello Spritz"], sem: ["Piña Colada", "Limonada Suíça"] },
+  34: { com: COM11, sem: SEM4 },
+  35: { com: COM11, sem: SEM4 },
+  36: { com: [], sem: SEM10 },
+  37: { com: ["Caipirinha", "Caipiroska", "Saquêrinhas", "Gin Tônica", "Mojito", "Aperol Spritz", "Moscow Mule", "Negroni"], sem: SEM4 },
+  38: { com: [], sem: SEM9 },
+  39: { com: ["Caipirinha", "Caipiroska", "Saquêrinhas", "Gin Tônica", "Mojito", "Aperol Spritz", "Moscow Mule", "Negroni", "Fitzgerald (para o noivo)"], sem: SEM4 },
+  40: { com: ["Caipirinha", "Caipiroska", "Saquêrinhas", "Aperol Spritz", "Gin Tônica", "Limoncello Spritz", "Moscow Mule", "Negroni", "Mojito", "Canópia", "Mango Passion (drink autoral dos noivos)"], sem: ["Piña Colada", "Limonada Suíça", "Soda Italiana"] },
+  41: { com: COM11, sem: SEM4 },
+  42: { com: ["Caipirinha", "Caipiroska", "Saquêrinhas", "Gin Tônica", "Limoncello Spritz", "Aperol Spritz", "Moscow Mule", "Negroni"], sem: ["Piña Colada", "Limonada Suíça"], extra: ["Ponto de atenção: verificar se pode ter o consumo puro"] },
+  43: { com: ["Caipirinha", "Caipiroska", "Saquêrinhas", "Gin Tônica", "Mojito", "Aperol Spritz", "Moscow Mule", "Negroni", "Mango Passion"], sem: SEM4 },
+  44: { com: ["Caipirinha (pinga Salinas)", "Caipiroska (vodka Smirnoff)", "Saquêrinhas (saquê Fuji e Sakeih)", "Espanhola (vinho)", "Lagoa Azul", "Gin Tônica (gin Tanqueray)", "Mojito", "Aperol Spritz", "Moscow Mule", "Negroni", "Sex on the Beach"], sem: SEM4 },
+  45: { com: ["Caipirinha", "Caipiroska", "Saquêrinhas", "Espanhola", "Sex on the Beach", "Lagoa Azul", "Mojito", "Gin Tônica (gin Tanqueray)", "Moscow Mule", "Negroni", "Aperol Spritz"], sem: SEM4 }
+  /* Sem cardápio (sem PDF de Bartender): 2 (José Carlos), 16 (Matheus e Daisy) */
+};
+
+function menuHtml(e) {
+  const d = DRINKS[e.id];
+  if (!d) return `<div class="sec"><h4>Cardápio de drinks</h4><p class="muted">Cardápio ainda não enviado. Não há PDF de Bartender para este evento.</p></div>`;
+  const list = (title, items, cls) => items.length
+    ? `<div class="mn ${cls}"><h5>${title} <span>${items.length}</span></h5><ul class="menu">${items.map(i => `<li>${esc(i)}</li>`).join("")}</ul></div>` : "";
+  const extra = d.extra && d.extra.length
+    ? `<div class="mn extra"><h5>Extras do bar</h5><ul class="menu">${d.extra.map(i => `<li>${esc(i)}</li>`).join("")}</ul></div>` : "";
+  return `<div class="sec"><h4>Cardápio de drinks</h4>${list("Com álcool", d.com, "com")}${list("Sem álcool", d.sem, "sem")}${extra}</div>`;
+}
+
+const MONTHS = ["janeiro","fevereiro","março","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"];
+const WDAYS = ["Domingo","Segunda","Terça","Quarta","Quinta","Sexta","Sábado"];
+const MIN = { y: 2026, m: 9 }, MAX = { y: 2026, m: 11 };
+let view = { y: 2026, m: 10 };
+let active = new Set(Object.keys(SPACES));
+let current = null, lastFocus = null;
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const pad = n => String(n).padStart(2, "0");
+const key = (y, m, d) => y + "-" + pad(m + 1) + "-" + pad(d);
+const parse = s => { const [y, m, d] = s.split("-").map(Number); return { y, m: m - 1, d }; };
+const wday = s => { const p = parse(s); return new Date(p.y, p.m, p.d).getDay(); };
+const hour = t => { if (!t) return ""; const [h, m] = t.split(":").map(Number); return m ? h + "h" + pad(m) : h + "h"; };
+const dmy = s => { const p = parse(s); return pad(p.d) + "/" + pad(p.m + 1) + "/" + p.y; };
+const fmtGuests = e => e.guests + (e.staff ? " + " + e.staff + " staff" : "");
+
+function monthEvents() {
+  return EVENTS.filter(e => { const p = parse(e.date); return p.y === view.y && p.m === view.m; })
+    .sort((a, b) => a.date.localeCompare(b.date) || a.time.localeCompare(b.time));
+}
+const visible = () => monthEvents().filter(e => active.has(e.space));
+
+function renderPills() {
+  const me = monthEvents();
+  $("pills").innerHTML = Object.keys(SPACES).map(k => {
+    const n = me.filter(e => e.space === k).length;
+    return `<button class="pill" data-s="${k}" data-sp="${k}" aria-pressed="${active.has(k)}"><i></i>${SPACES[k]} <span>${n}</span></button>`;
+  }).join("");
+}
+
+function renderCal() {
+  const { y, m } = view;
+  $("mlabel").textContent = MONTHS[m] + " " + y;
+  $("prev").disabled = y === MIN.y && m === MIN.m;
+  $("next").disabled = y === MAX.y && m === MAX.m;
+  renderPills();
+
+  const ev = visible();
+  const by = {};
+  ev.forEach(e => (by[e.date] = by[e.date] || []).push(e));
+
+  const first = new Date(y, m, 1).getDay();
+  const dim = new Date(y, m + 1, 0).getDate();
+  const prevDim = new Date(y, m, 0).getDate();
+  const total = Math.ceil((first + dim) / 7) * 7;
+  const now = new Date();
+  const todayKey = key(now.getFullYear(), now.getMonth(), now.getDate());
+
+  let html = WDAYS.map(w => `<div class="wd">${w.slice(0, 3)}</div>`).join("");
+  for (let i = 0; i < total; i++) {
+    const d = i - first + 1;
+    if (d < 1 || d > dim) {
+      html += `<div class="day out"><span class="dn">${d < 1 ? prevDim + d : d - dim}</span></div>`;
+      continue;
+    }
+    const k = key(y, m, d);
+    const chips = (by[k] || []).map(e =>
+      `<button class="chip" data-s="${e.space}" data-id="${e.id}" title="${esc(e.name)}"><i></i><b>${hour(e.time)}</b><span class="nm">${esc(e.short)}</span><span class="g">${e.guests}</span></button>`).join("");
+    html += `<div class="day${k === todayKey ? " today" : ""}"><span class="dn">${d}</span>${chips}</div>`;
+  }
+  $("cal").innerHTML = html;
+
+  const dates = Object.keys(by).sort();
+  $("agenda").innerHTML = dates.map(k => {
+    const p = parse(k);
+    const cards = by[k].map(e =>
+      `<button class="card" data-s="${e.space}" data-id="${e.id}">
+        <div class="r1"><em><i></i>${SPACES[e.space]}</em><span>${hour(e.time)}</span></div>
+        <div class="nm">${esc(e.short)}</div>
+        <div class="r3">${fmtGuests(e)} convidados · ${BAR[e.bar].t}</div></button>`).join("");
+    return `<div class="ag-day"><div class="ag-date"><b>${p.d}</b><span>${WDAYS[wday(k)].slice(0, 3)}</span></div><div class="ag-list">${cards}</div></div>`;
+  }).join("");
+
+  const sum = ev.reduce((a, e) => a + e.guests, 0);
+  $("tot").innerHTML = `<b>${ev.length}</b> ${ev.length === 1 ? "evento" : "eventos"} · <b>${sum.toLocaleString("pt-BR")}</b> convidados`;
+
+  const empty = $("empty");
+  if (!ev.length) {
+    empty.hidden = false;
+    empty.textContent = monthEvents().length
+      ? "Nenhum evento nos espaços selecionados."
+      : "Nenhum evento lançado em " + MONTHS[m] + ". Eles aparecem aqui quando entram no canal #planejamento-bartender.";
+  } else empty.hidden = true;
+}
+
+function openEvent(id, fromNav) {
+  const e = EVENTS.find(x => x.id === id);
+  if (!e) return;
+  current = e;
+  if (!fromNav) lastFocus = document.activeElement;
+  const sheet = $("sheet");
+  sheet.setAttribute("data-s", e.space);
+  $("sh-space").textContent = SPACES[e.space];
+  $("sh-title").textContent = e.name;
+  $("sh-date").textContent = WDAYS[wday(e.date)] + ", " + dmy(e.date);
+  const b = BAR[e.bar];
+  const docs = e.docs.length
+    ? e.docs.map(d => `<span class="doc">${esc(d)}</span>`).join("")
+    : `<span class="doc miss">Nenhum PDF anexado</span>`;
+  $("sh-body").innerHTML =
+    (e.alerts || []).map(a => `<div class="alert">${esc(a)}</div>`).join("") +
+    `<dl class="facts">
+      <div><dt>Convite</dt><dd>${hour(e.time) || "Não informado"}</dd></div>
+      <div><dt>Convidados</dt><dd>${fmtGuests(e)}</dd></div>
+      <div><dt>Mesas</dt><dd>${esc(e.tables)}</dd></div>
+      <div><dt>Duração</dt><dd>${esc(e.party)}</dd></div>
+      <div class="wide"><dt>Bar</dt><dd><span class="badge ${b.k}">${b.t}</span></dd></div>
+    </dl>` +
+    `<div class="sec"><h4>Observações</h4>${e.obs.length ? "<ul>" + e.obs.map(o => `<li>${esc(o)}</li>`).join("") + "</ul>" : "<p>Sem observações no post.</p>"}</div>` +
+    menuHtml(e) +
+    `<div class="sec"><h4>Documentos no Slack</h4><div class="docs">${docs}</div></div>`;
+  $("sh-body").scrollTop = 0;
+  const all = EVENTS.slice().sort((a, b2) => a.date.localeCompare(b2.date) || a.time.localeCompare(b2.time));
+  const i = all.findIndex(x => x.id === e.id);
+  $("evprev").disabled = i <= 0;
+  $("evnext").disabled = i >= all.length - 1;
+  $("evprev").dataset.to = i > 0 ? all[i - 1].id : "";
+  $("evnext").dataset.to = i < all.length - 1 ? all[i + 1].id : "";
+  $("overlay").hidden = false;
+  $("close").focus();
+}
+
+function closeEvent() {
+  $("overlay").hidden = true;
+  current = null;
+  if (lastFocus && document.contains(lastFocus)) lastFocus.focus();
+}
+
+function shiftMonth(delta) {
+  let m = view.m + delta, y = view.y;
+  if (m < 0) { m = 11; y--; } else if (m > 11) { m = 0; y++; }
+  if (y < MIN.y || (y === MIN.y && m < MIN.m) || y > MAX.y || (y === MAX.y && m > MAX.m)) return;
+  view = { y, m };
+  renderCal();
+}
+
+$("prev").addEventListener("click", () => shiftMonth(-1));
+$("next").addEventListener("click", () => shiftMonth(1));
+$("pills").addEventListener("click", ev => {
+  const b = ev.target.closest("[data-sp]");
+  if (!b) return;
+  const k = b.dataset.sp;
+  active.has(k) ? active.delete(k) : active.add(k);
+  renderCal();
+});
+document.addEventListener("click", ev => {
+  const t = ev.target.closest(".chip, .card");
+  if (t && t.dataset.id) openEvent(Number(t.dataset.id));
+});
+$("close").addEventListener("click", closeEvent);
+$("scrim").addEventListener("click", closeEvent);
+["evprev", "evnext"].forEach(id => $(id).addEventListener("click", ev => {
+  const to = ev.currentTarget.dataset.to;
+  if (!to) return;
+  const e = EVENTS.find(x => x.id === Number(to));
+  const p = parse(e.date);
+  if (p.y !== view.y || p.m !== view.m) { view = { y: p.y, m: p.m }; renderCal(); }
+  openEvent(e.id, true);
+}));
+document.addEventListener("keydown", ev => {
+  if (ev.key === "Escape" && !$("overlay").hidden) closeEvent();
+});
+
+renderCal();
+</script>
+</body>
+</html>
