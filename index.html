@@ -338,7 +338,7 @@ const EVENTS = [
   { id: 41, date: "2026-10-31", space: "acqua", name: "Joyce dos Santos de Melo e Celso", short: "Joyce e Celso", time: "15:30", guests: 120, tables: "17 + mesa da família", party: "7h de festa", bar: "cs",
     obs: ["Terá chopp", "O noivo traz pequenas quantidades de whisky para deixar ponto no bar e contratou 30 copos de whisky"], docs: [BARTENDER, CRONO], alerts: ["Convidados corrigidos de 140 para 120."] },
   { id: 42, date: "2026-10-31", space: "serra", name: "Ana Paula de Melo Sousa Witeck e Jordano Fontana Witeck", short: "Ana Paula e Jordano", time: "16:30", guests: 170, tables: "19 + mesa da família", party: "8h de festa", bar: "cs",
-    obs: ["Open chopp artesanal Giffa", "Torre de taças com 50 unidades", "Taxa rolha"], docs: [BARTENDER], alerts: ["Convidados atualizados de 100 para 170 em 20/10. Ponto de atenção do PDF: verificar se pode ter o consumo puro (sem resposta no Slack)."] },
+    obs: ["Open chopp artesanal Giffa", "Torre de taças com 50 unidades", "Taxa rolha"], docs: [BARTENDER], alerts: ["Convidados atualizados de 100 para 170 em 20/10."] },
   { id: 43, date: "2026-11-01", space: "florest", name: "Mariana Santos Ribeiro Lima e Alessio", short: "Mariana e Alessio", time: "15:00", guests: 200, tables: "24 + mesa dos noivos", party: "6h de festa", bar: "cs",
     obs: ["Convite às 15h, na igreja", "120 litros de chope Brahma"], docs: [BARTENDER], alerts: ["Cronograma do evento não localizado no Slack."] },
   { id: 44, date: "2026-11-01", space: "acqua", name: "Juliana Paixão Dall Agnol Bento e Matheus", short: "Juliana e Matheus", time: "15:30", guests: 215, tables: "26 + staff", party: "6h de festa", bar: "cs",
@@ -348,7 +348,11 @@ const EVENTS = [
 
   /* Incluído por pedido, fora do Slack (manter nas atualizações) */
   { id: 46, date: "2026-11-02", space: "villa", name: "Oficina de coquetelaria", short: "Oficina de coquetelaria", time: "15:00", guests: null, tables: "Não informado", party: "5h (das 15h às 20h)", bar: "nd",
-    obs: ["Oficina de coquetelaria", "Das 15h às 20h", "Incluído por pedido do Thiago; não consta no canal do Slack"], docs: [] }
+    obs: ["Oficina de coquetelaria", "Das 15h às 20h", "Incluído por pedido do Thiago; não consta no canal do Slack"], docs: [] },
+
+  /* Novos no canal (rotina de atualização) */
+  { id: 47, date: "2026-11-19", space: "serra", name: "Denis Robert Silva de Oliveira e Vitória", short: "Denis e Vitória", time: "16:00", guests: 110, tables: "16 + mesa dos noivos", party: "Não informado", bar: "so",
+    obs: ["Bar sem álcool", "Assessoria externa"], docs: [BARTENDER, CRONO] }
 ];
 
 /* Cardápios conforme os PDFs de Bartender de cada evento. Sem PDF = sem cardápio. */
@@ -402,11 +406,12 @@ const DRINKS = {
   39: { com: ["Caipirinha", "Caipiroska", "Saquêrinhas", "Gin Tônica", "Mojito", "Aperol Spritz", "Moscow Mule", "Negroni", "Fitzgerald (para o noivo)"], sem: SEM4 },
   40: { com: ["Caipirinha", "Caipiroska", "Saquêrinhas", "Aperol Spritz", "Gin Tônica", "Limoncello Spritz", "Moscow Mule", "Negroni", "Mojito", "Canópia", "Mango Passion (drink autoral dos noivos)"], sem: ["Piña Colada", "Limonada Suíça", "Soda Italiana"] },
   41: { com: COM11, sem: SEM4 },
-  42: { com: ["Caipirinha", "Caipiroska", "Saquêrinhas", "Gin Tônica", "Limoncello Spritz", "Aperol Spritz", "Moscow Mule", "Negroni"], sem: ["Piña Colada", "Limonada Suíça"], extra: ["Ponto de atenção: verificar se pode ter o consumo puro"] },
+  42: { com: ["Caipirinha", "Caipiroska", "Saquêrinhas", "Gin Tônica", "Limoncello Spritz", "Aperol Spritz", "Moscow Mule", "Negroni"], sem: ["Piña Colada", "Limonada Suíça"], extra: ["Consumo puro: o noivo perguntou se convidados pontuais podem tomar só a dose de Campari, em vez do Negroni. Resposta em 26/10: a dose é servida a quem pedir; se a saída for maior que a do Negroni, entra como drink extra."] },
   43: { com: ["Caipirinha", "Caipiroska", "Saquêrinhas", "Gin Tônica", "Mojito", "Aperol Spritz", "Moscow Mule", "Negroni", "Mango Passion"], sem: SEM4 },
   44: { com: ["Caipirinha (pinga Salinas)", "Caipiroska (vodka Smirnoff)", "Saquêrinhas (saquê Fuji e Sakeih)", "Espanhola (vinho)", "Lagoa Azul", "Gin Tônica (gin Tanqueray)", "Mojito", "Aperol Spritz", "Moscow Mule", "Negroni", "Sex on the Beach"], sem: SEM4 },
   45: { com: ["Caipirinha", "Caipiroska", "Saquêrinhas", "Espanhola", "Sex on the Beach", "Lagoa Azul", "Mojito", "Gin Tônica (gin Tanqueray)", "Moscow Mule", "Negroni", "Aperol Spritz"], sem: SEM4 }
-  /* Sem cardápio (sem PDF de Bartender): 2 (José Carlos), 16 (Matheus e Daisy) */
+  , 47: { com: [], sem: SEM9 }
+  /* Sem cardápio (sem PDF de Bartender): 2 (José Carlos), 16 (Matheus e Daisy), 46 (Oficina) */
 };
 
 /* Escala da equipe, só os nomes, enviada toda quarta: id do evento -> lista de nomes */
