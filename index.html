@@ -344,7 +344,11 @@ const EVENTS = [
   { id: 44, date: "2026-11-01", space: "acqua", name: "Juliana Paixão Dall Agnol Bento e Matheus", short: "Juliana e Matheus", time: "15:30", guests: 215, tables: "26 + staff", party: "6h de festa", bar: "cs",
     obs: ["Long neck"], docs: [BARTENDER], alerts: ["Cronograma do evento não localizado no Slack."] },
   { id: 45, date: "2026-11-01", space: "serra", name: "Carlos Camillo Nava e Catharina", short: "Carlos e Catharina", time: "16:30", guests: 250, tables: "33", party: "6h de festa", bar: "cs",
-    obs: ["Long neck", "Taxa rolha"], docs: [BARTENDER, CRONO] }
+    obs: ["Long neck", "Taxa rolha"], docs: [BARTENDER, CRONO] },
+
+  /* Incluído por pedido, fora do Slack (manter nas atualizações) */
+  { id: 46, date: "2026-11-02", space: "villa", name: "Oficina de coquetelaria", short: "Oficina de coquetelaria", time: "15:00", guests: null, tables: "Não informado", party: "5h (das 15h às 20h)", bar: "nd",
+    obs: ["Oficina de coquetelaria", "Das 15h às 20h", "Incluído por pedido do Thiago; não consta no canal do Slack"], docs: [] }
 ];
 
 /* Cardápios conforme os PDFs de Bartender de cada evento. Sem PDF = sem cardápio. */
@@ -427,6 +431,21 @@ let view = clampMonth(new Date().getFullYear(), new Date().getMonth());
 let active = new Set(Object.keys(SPACES));
 let current = null, lastFocus = null;
 
+/* Lembra mês, filtros e evento aberto neste navegador, para a página voltar igual depois de atualizar */
+const STORE_KEY = "agenda-bartender:v1";
+function saveState() {
+  try { localStorage.setItem(STORE_KEY, JSON.stringify({ y: view.y, m: view.m, active: [...active], open: current ? current.id : null })); } catch (_) {}
+}
+function loadState() {
+  try {
+    const s = JSON.parse(localStorage.getItem(STORE_KEY) || "null");
+    if (!s) return null;
+    if (Number.isInteger(s.y) && Number.isInteger(s.m)) view = clampMonth(s.y, s.m);
+    if (Array.isArray(s.active)) { const a = s.active.filter(k => k in SPACES); if (a.length) active = new Set(a); }
+    return Number.isInteger(s.open) ? s.open : null;
+  } catch (_) { return null; }
+}
+
 const $ = id => document.getElementById(id);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const pad = n => String(n).padStart(2, "0");
@@ -435,7 +454,7 @@ const parse = s => { const [y, m, d] = s.split("-").map(Number); return { y, m: 
 const wday = s => { const p = parse(s); return new Date(p.y, p.m, p.d).getDay(); };
 const hour = t => { if (!t) return ""; const [h, m] = t.split(":").map(Number); return m ? h + "h" + pad(m) : h + "h"; };
 const dmy = s => { const p = parse(s); return pad(p.d) + "/" + pad(p.m + 1) + "/" + p.y; };
-const fmtGuests = e => e.guests + (e.staff ? " + " + e.staff + " staff" : "");
+const fmtGuests = e => e.guests == null ? "Não informado" : e.guests + (e.staff ? " + " + e.staff + " staff" : "");
 
 const ALL = EVENTS.slice().sort((a, b) => a.date.localeCompare(b.date) || a.time.localeCompare(b.time));
 
@@ -451,7 +470,7 @@ function renderWeeks(ev) {
     const start = new Date(p.y, p.m, p.d - dt.getDay());
     const k = key(start.getFullYear(), start.getMonth(), start.getDate());
     const w = weeks.get(k) || { start, n: 0, g: 0 };
-    w.n++; w.g += e.guests; weeks.set(k, w);
+    w.n++; w.g += e.guests || 0; weeks.set(k, w);
   });
   if (!weeks.size) { sec.hidden = true; return; }
   const list = [...weeks.values()].sort((a, b) => a.start - b.start);
@@ -501,7 +520,7 @@ function renderCal() {
     }
     const k = key(y, m, d);
     const chips = (by[k] || []).map(e =>
-      `<button class="chip" data-s="${e.space}" data-id="${e.id}" title="${esc(e.name)}"><i></i><span class="tx"><span class="top"><b>${hour(e.time) || "—"}</b><span class="g">${e.guests}</span></span><span class="nm">${esc(e.short)}</span></span></button>`).join("");
+      `<button class="chip" data-s="${e.space}" data-id="${e.id}" title="${esc(e.name)}"><i></i><span class="tx"><span class="top"><b>${hour(e.time) || "—"}</b><span class="g">${e.guests == null ? "" : e.guests}</span></span><span class="nm">${esc(e.short)}</span></span></button>`).join("");
     html += `<div class="day${k === todayKey ? " today" : ""}"><span class="dn">${d}</span>${chips}</div>`;
   }
   $("cal").innerHTML = html;
@@ -513,11 +532,11 @@ function renderCal() {
       `<button class="card" data-s="${e.space}" data-id="${e.id}">
         <div class="r1"><em><i></i>${SPACES[e.space]}</em><span>${hour(e.time)}</span></div>
         <div class="nm">${esc(e.short)}</div>
-        <div class="r3">${fmtGuests(e)} convidados · ${BAR[e.bar].t}</div></button>`).join("");
+        <div class="r3">${e.guests == null ? "Convidados não informados" : fmtGuests(e) + " convidados"} · ${BAR[e.bar].t}</div></button>`).join("");
     return `<div class="ag-day"><div class="ag-date"><b>${p.d}</b><span>${WDAYS[wday(k)].slice(0, 3)}</span></div><div class="ag-list">${cards}</div></div>`;
   }).join("");
 
-  const sum = ev.reduce((a, e) => a + e.guests, 0);
+  const sum = ev.reduce((a, e) => a + (e.guests || 0), 0);
   $("tot").innerHTML = `<b>${ev.length}</b> ${ev.length === 1 ? "evento" : "eventos"} · <b>${sum.toLocaleString("pt-BR")}</b> convidados`;
 
   renderWeeks(ev);
@@ -529,6 +548,7 @@ function renderCal() {
       ? "Nenhum evento nos espaços selecionados."
       : "Nenhum evento lançado em " + MONTHS[m] + ". Eles aparecem aqui quando entram no canal #planejamento-bartender.";
   } else empty.hidden = true;
+  saveState();
 }
 
 /* Controle da equipe: guardado no db do artefato (coleção "controle", um documento por evento). */
@@ -660,6 +680,7 @@ function openEvent(id, fromNav) {
   $("evnext").dataset.to = i < ALL.length - 1 ? ALL[i + 1].id : "";
   $("overlay").hidden = false;
   document.documentElement.classList.add("lock");
+  saveState();
   $("close").focus();
 }
 
@@ -669,6 +690,7 @@ function closeEvent() {
   $("overlay").hidden = true;
   document.documentElement.classList.remove("lock");
   current = null;
+  saveState();
   if (lastFocus && document.contains(lastFocus)) { lastFocus.focus(); return; }
   const back = id && document.querySelector('[data-id="' + id + '"]');
   (back || $("next")).focus();
@@ -729,7 +751,9 @@ document.addEventListener("keydown", ev => {
   else if (!ev.shiftKey && at === last) { ev.preventDefault(); first.focus(); }
 });
 
+const reopen = loadState();
 renderCal();
+if (reopen !== null && EVENTS.some(x => x.id === reopen)) openEvent(reopen, true);
 initDb();
 </script>
 </body>
