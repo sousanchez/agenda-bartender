@@ -409,6 +409,16 @@ const DRINKS = {
   /* Sem cardápio (sem PDF de Bartender): 2 (José Carlos), 16 (Matheus e Daisy) */
 };
 
+/* Escala da equipe, só os nomes, enviada toda quarta: id do evento -> lista de nomes */
+const ESCALA = {};
+const ESCALA_EM = "";
+
+function escalaHtml(e) {
+  const n = ESCALA[e.id];
+  if (!n || !n.length) return "";
+  return `<div class="sec"><h4>Escala</h4><ul class="menu">${n.map(x => `<li>${esc(x)}</li>`).join("")}</ul>${ESCALA_EM ? `<p class="muted">Atualizada em ${esc(ESCALA_EM)}</p>` : ""}</div>`;
+}
+
 function menuHtml(e) {
   const d = DRINKS[e.id];
   if (!d) return `<div class="sec"><h4>Cardápio de drinks</h4><p class="muted">Cardápio ainda não enviado. Não há PDF de Bartender para este evento.</p></div>`;
@@ -669,6 +679,7 @@ function openEvent(id, fromNav) {
     </dl>` +
     `<div class="sec"><h4>Observações</h4>${e.obs.length ? "<ul>" + e.obs.map(o => `<li>${esc(o)}</li>`).join("") + "</ul>" : "<p>Sem observações no post.</p>"}</div>` +
     menuHtml(e) +
+    escalaHtml(e) +
     `<div id="ctl-wrap"></div>` +
     `<div class="sec"><h4>Documentos no Slack</h4><div class="docs">${docs}</div></div>`;
   $("sh-body").scrollTop = 0;
