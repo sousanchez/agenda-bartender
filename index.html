@@ -364,7 +364,9 @@ const EVENTS = [
   { id: 52, date: "2026-11-22", space: "acqua", name: "Camila Agostinis Silva e Lucas", short: "Camila e Lucas", time: "14:00", guests: 170, tables: "23 + mesa dos noivos", party: "8h de festa", bar: "cs",
     obs: ["Long neck"], docs: [BARTENDER, CRONO] },
   { id: 53, date: "2026-11-22", space: "serra", name: "Murilo Matos Bernardo e Kaillany", short: "Murilo e Kaillany", time: "14:30", guests: 167, tables: "23", party: "6h de festa", bar: "cs",
-    obs: ["Bar ilha com limão siciliano central", "Não possuem outro tipo de bebida contratada"], docs: [BARTENDER, "Foto de referência"] }
+    obs: ["Bar ilha com limão siciliano central", "Não possuem outro tipo de bebida contratada"], docs: [BARTENDER, "Foto de referência"] },
+  { id: 54, date: "2026-11-22", space: "florest", name: "Giovanna Xavier Leão dos Santos e Lucas Campos", short: "Giovanna e Lucas", time: "16:30", guests: 100, tables: "14 + mesa dos noivos", party: "6h de festa", bar: "cs",
+    obs: ["Carrinho de chopp", "Open chope Brahma para 100 pessoas"], docs: [BARTENDER, "Bebidas (PDF)", CRONO] }
 ];
 
 /* Cardápios conforme os PDFs de Bartender de cada evento. Sem PDF = sem cardápio. */
@@ -428,7 +430,9 @@ const DRINKS = {
   50: { com: ["Caipirinha (cachaça Salinas ou equivalente)", "Caipiroska (vodka Smirnoff ou equivalente)", "Saquêrinhas (saquê Fuji e/ou Sakeih ou equivalente)", "Aperol Spritz", "Limoncello Spritz", "Moscow Mule", "Mojito", "Sex on the Beach", "Fitzgerald"], sem: ["Piña Colada", "Limonada Suíça", "Soda Italiana"] },
   51: { com: ["Caipirinha", "Caipiroska", "Saquêrinhas", "Gin Tônica", "Mojito", "Aperol Spritz", "Moscow Mule", "Negroni", "Mango Passion", "Fitzgerald (insumos trazidos pelos noivos)"], sem: SEM4 },
   52: { com: COM11, sem: SEM4 },
-  53: { com: COM11, sem: SEM4 }
+  53: { com: COM11, sem: SEM4 },
+  54: { com: ["Caipirinha", "Caipiroska", "Saquêrinhas", "Sex on the Beach", "Gin Tônica (gin Tanqueray)", "Mojito", "Aperol Spritz", "Moscow Mule", "Negroni"], sem: SEM4,
+        extra: ["Bebidas (PDF): open chope Brahma, servido em carrinho, para 100 pessoas"] }
   /* Sem cardápio (sem PDF de Bartender): 2 (José Carlos), 16 (Matheus e Daisy), 46 (Oficina) */
 };
 
