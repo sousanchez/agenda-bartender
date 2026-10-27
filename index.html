@@ -125,6 +125,34 @@ h1 { font-family: var(--f-display); font-weight: 700; font-size: clamp(26px, 4vw
 .wkp { height: 110px; display: flex; align-items: flex-end; border-bottom: 1px solid var(--line); }
 .wkb { width: 100%; max-width: 56px; margin: 0 auto; background: var(--accent); border-radius: 4px 4px 0 0; min-height: 2px; }
 .wkl { text-align: center; font-size: 11px; line-height: 1.25; color: var(--muted); font-variant-numeric: tabular-nums; }
+.tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); margin-bottom: 16px; }
+.tab { padding: 8px 14px; border: 0; background: transparent; font-weight: 600; color: var(--muted); border-bottom: 2px solid transparent; margin-bottom: -1px; }
+.tab[aria-selected="true"] { color: var(--fg); border-bottom-color: var(--accent); }
+.rp { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 16px; margin-bottom: 16px; }
+.rp h2 { font-family: var(--f-display); font-size: 18px; font-weight: 600; margin: 0 0 8px; }
+.rp h3 { font-size: 13px; font-weight: 600; color: var(--muted); margin: 14px 0 6px; text-transform: uppercase; letter-spacing: 0.06em; }
+.rp-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px; }
+.rp-head h2 { margin: 0; }
+.rw-nav { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.rw-label { font-weight: 600; font-variant-numeric: tabular-nums; min-width: 12ch; text-align: center; }
+.rw-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 14px; }
+#rw-text { width: 100%; margin-top: 10px; font: inherit; font-size: 13px; color: var(--fg); background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; }
+.ritem { display: grid; grid-template-columns: 56px minmax(0, 1fr); gap: 2px 10px; width: 100%; text-align: left; padding: 8px 10px; border: 0; border-radius: 8px; background: var(--cbg); margin-bottom: 6px; align-items: baseline; }
+.ritem .rt { font-weight: 600; font-variant-numeric: tabular-nums; grid-row: 1 / span 2; }
+.ritem .rn { font-weight: 600; overflow-wrap: anywhere; }
+.ritem .rm { font-size: 13px; color: var(--muted); overflow-wrap: anywhere; }
+.ritem i { display: none; }
+.pd-row { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; width: 100%; text-align: left; padding: 8px 10px; border: 0; border-bottom: 1px solid var(--line); background: transparent; }
+.pd-row .pn { font-weight: 600; overflow-wrap: anywhere; }
+.pd-row .pm { font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.miss { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 12px; font-weight: 600; background: var(--warn-bg); color: var(--warn); margin-right: 4px; }
+.pk-row { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 2px 12px; width: 100%; text-align: left; padding: 10px; border: 0; border-bottom: 1px solid var(--line); background: transparent; align-items: baseline; }
+.pk-row .pdte { font-weight: 600; font-variant-numeric: tabular-nums; }
+.pk-row .pdte small { display: block; font-weight: 400; color: var(--muted); }
+.pk-row .pinfo { font-size: 14px; }
+.pk-row .pinfo b { font-variant-numeric: tabular-nums; }
+.pk-row .psp { display: inline-flex; align-items: center; gap: 6px; margin-right: 10px; }
+.pk-row .psp i { width: 9px; height: 9px; border-radius: 50%; background: var(--c); }
 .foot { margin-top: 18px; color: var(--muted); font-size: 13px; max-width: 70ch; }
 
 #overlay { position: fixed; inset: 0; z-index: 20; }
@@ -210,6 +238,12 @@ img { max-width: 100%; }
     </div>
   </header>
 
+  <div class="tabs" role="tablist" aria-label="Visões da agenda">
+    <button class="tab" role="tab" id="tab-cal" aria-selected="true" aria-controls="view-cal">Calendário</button>
+    <button class="tab" role="tab" id="tab-rep" aria-selected="false" tabindex="-1" aria-controls="view-rep">Relatórios</button>
+  </div>
+
+  <div id="view-cal" role="tabpanel" aria-labelledby="tab-cal">
   <div class="bar">
     <div class="pills" id="pills" role="group" aria-label="Filtrar por espaço"></div>
     <div class="tot" id="tot"></div>
@@ -223,6 +257,44 @@ img { max-width: 100%; }
     <h2 id="wk-h">Convidados por semana <span class="wkn">só eventos do mês exibido, sem staff</span></h2>
     <div class="wkbars" id="wk" role="list"></div>
   </section>
+
+  </div>
+
+  <div id="view-rep" role="tabpanel" aria-labelledby="tab-rep" hidden>
+    <section class="rp" aria-labelledby="rw-h">
+      <div class="rp-head">
+        <h2 id="rw-h">Resumo da semana</h2>
+        <div class="rw-nav">
+          <button class="icon-btn" id="rw-prev" aria-label="Semana anterior"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
+          <span class="rw-label" id="rw-label" aria-live="polite"></span>
+          <button class="icon-btn" id="rw-next" aria-label="Próxima semana"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
+          <button class="btn" id="rw-today">Esta semana</button>
+        </div>
+      </div>
+      <p class="muted" id="rw-tot"></p>
+      <div id="rw-list"></div>
+      <div class="rw-actions">
+        <button class="btn" id="rw-copy">Copiar resumo para o WhatsApp</button>
+        <span class="muted" id="rw-msg" aria-live="polite"></span>
+      </div>
+      <textarea id="rw-text" aria-label="Texto do resumo da semana" readonly rows="10" hidden></textarea>
+    </section>
+
+    <section class="rp" aria-labelledby="pd-h">
+      <h2 id="pd-h">Pendências</h2>
+      <p class="muted" id="pd-tot"></p>
+      <div id="pd-list"></div>
+      <button class="btn" id="pd-more" hidden></button>
+      <div id="pd-cal"></div>
+    </section>
+
+    <section class="rp" aria-labelledby="pk-h">
+      <h2 id="pk-h">Dias de pico</h2>
+      <p class="muted">Dias com 2 ou mais eventos, a partir de hoje. Toque num dia para abri-lo no calendário.</p>
+      <div id="pk-list"></div>
+      <button class="btn" id="pk-more" hidden></button>
+    </section>
+  </div>
 
   <p class="foot">Fontes: posts do canal #planejamento-bartender e calendários Eventos Serra, Florest e Acqua do Google Agenda. Os cardápios vêm dos PDFs de Bartender no Slack. Eventos que só estão no calendário ainda não somam convidados. Convidados não incluem staff.</p>
 </div>
@@ -348,7 +420,7 @@ const EVENTS = [
 
   /* Incluído por pedido, fora do Slack (manter nas atualizações) */
   { id: 46, date: "2026-11-02", space: "villa", name: "Oficina de coquetelaria", short: "Oficina de coquetelaria", time: "15:00", guests: null, tables: "Não informado", party: "5h (das 15h às 20h)", bar: "nd",
-    obs: ["Oficina de coquetelaria", "Das 15h às 20h", "Incluído por pedido do Thiago; não consta no canal do Slack"], docs: [] },
+    obs: ["Oficina de coquetelaria", "Das 15h às 20h", "Incluído por pedido do Thiago; não consta no canal do Slack"], docs: [], manual: true },
 
   /* Novos no canal (rotina de atualização) */
   { id: 47, date: "2026-11-19", space: "serra", name: "Denis Robert Silva de Oliveira e Vitória", short: "Denis e Vitória", time: "16:00", guests: 110, tables: "16 + mesa dos noivos", party: "Não informado", bar: "so",
@@ -416,7 +488,7 @@ const EVENTS = [
   {id: 99, date: "2026-12-19", space: "acqua", name: "Bianca Gabrielli Marques e Caique", short: "Bianca e Caique", time: "14:00", guests: null, tables: "Não informado", party: "Não informado", bar: "nd", obs: ["Calendário Eventos Acqua: pacote, casamento", "Convite 14:00, cerimônia 14:30, buffet 15:30"], docs: [], alerts: ["Só consta no calendário Eventos Acqua. Ainda sem briefing do Slack (convidados, bar e cardápio)."], src: "agenda"},
   {id: 100, date: "2026-12-20", space: "acqua", name: "Pietra Renata Roberto e Carlos", short: "Pietra e Carlos", time: "15:30", guests: null, tables: "Não informado", party: "Não informado", bar: "nd", obs: ["Calendário Eventos Acqua: pacote, casamento", "Convite 15:30, cerimônia 16:00, buffet 17:00"], docs: [], alerts: ["Só consta no calendário Eventos Acqua. Ainda sem briefing do Slack (convidados, bar e cardápio)."], src: "agenda"},
   {id: 101, date: "2026-12-22", space: "acqua", name: "Beatriz da Apresentação e Fabiano Ribeiro da Silva", short: "Beatriz e Fabiano", time: "14:30", guests: null, tables: "Não informado", party: "Não informado", bar: "nd", obs: ["Calendário Eventos Acqua: pacote, casamento", "Convite 14:30, cerimônia 15:00, buffet 16:30", "Plano B no calendário do Florest (buffet no Acqua)"], docs: [], alerts: ["Só consta no calendário Eventos Acqua. Ainda sem briefing do Slack (convidados, bar e cardápio)."], src: "agenda"},
-  {id: 102, date: "2026-12-28", space: "acqua", name: "REFORMA ACQUA", short: "Reforma Acqua", time: "", guests: null, tables: "Não informado", party: "Não informado", bar: "nd", obs: ["Bloqueio no calendário Eventos Acqua: de 28/12/2026 a 08/01/2027"], docs: [], alerts: [], src: "agenda"}
+  {id: 102, date: "2026-12-28", space: "acqua", name: "REFORMA ACQUA", short: "Reforma Acqua", time: "", guests: null, tables: "Não informado", party: "Não informado", bar: "nd", obs: ["Bloqueio no calendário Eventos Acqua: de 28/12/2026 a 08/01/2027"], docs: [], alerts: [], src: "agenda", block: true}
 ];
 
 /* Cardápios conforme os PDFs de Bartender de cada evento. Sem PDF = sem cardápio. */
@@ -517,16 +589,18 @@ const clampMonth = (y, m) => {
 let view = clampMonth(new Date().getFullYear(), new Date().getMonth());
 let active = new Set(Object.keys(SPACES));
 let current = null, lastFocus = null;
+let rep = { tab: "cal", weekStart: null, text: "", showCal: false, allPeaks: false };
 
 /* Lembra mês, filtros e evento aberto neste navegador, para a página voltar igual depois de atualizar */
 const STORE_KEY = "agenda-bartender:v1";
 function saveState() {
-  try { localStorage.setItem(STORE_KEY, JSON.stringify({ y: view.y, m: view.m, active: [...active], open: current ? current.id : null })); } catch (_) {}
+  try { localStorage.setItem(STORE_KEY, JSON.stringify({ y: view.y, m: view.m, active: [...active], open: current ? current.id : null, tab: rep.tab })); } catch (_) {}
 }
 function loadState() {
   try {
     const s = JSON.parse(localStorage.getItem(STORE_KEY) || "null");
     if (!s) return null;
+    if (s.tab === "rep") rep.tab = "rep";
     if (Number.isInteger(s.y) && Number.isInteger(s.m)) view = clampMonth(s.y, s.m);
     if (Array.isArray(s.active)) { const a = s.active.filter(k => k in SPACES); if (a.length) active = new Set(a); }
     return Number.isInteger(s.open) ? s.open : null;
@@ -804,7 +878,7 @@ $("pills").addEventListener("click", ev => {
   if (nb) nb.focus();
 });
 document.addEventListener("click", ev => {
-  const t = ev.target.closest(".chip, .card");
+  const t = ev.target.closest(".chip, .card, .ritem");
   if (t && t.dataset.id) openEvent(Number(t.dataset.id));
 });
 /* os campos pertencem ao evento marcado em #ctl-wrap[data-ev], não ao evento aberto no momento */
@@ -839,8 +913,138 @@ document.addEventListener("keydown", ev => {
   else if (!ev.shiftKey && at === last) { ev.preventDefault(); first.focus(); }
 });
 
+/* ---------- Relatórios ---------- */
+const addDays = (d, n) => new Date(d.getFullYear(), d.getMonth(), d.getDate() + n);
+const dkey = d => key(d.getFullYear(), d.getMonth(), d.getDate());
+const fmtDM = d => pad(d.getDate()) + "/" + pad(d.getMonth() + 1);
+const startOfWeek = d => addDays(d, -d.getDay());
+const todayKey = () => dkey(new Date());
+const upcoming = () => { const t = todayKey(); return ALL.filter(e => e.date >= t && !e.block); };
+
+function weekText(start, end, by, days) {
+  const out = ["🍹 *EVENTOS DA SEMANA — " + fmtDM(start) + " a " + fmtDM(end) + "*"];
+  if (!days.length) out.push("", "Nenhum evento nesta semana.");
+  days.forEach(k => {
+    const p = parse(k);
+    out.push("", "📅 *" + WDAYS[wday(k)].toUpperCase() + " - " + pad(p.d) + "/" + pad(p.m + 1) + "*");
+    by[k].forEach(e => {
+      out.push("", "*" + e.name + "*");
+      out.push("📍 " + SPACES[e.space] + " | 🕒 " + (hour(e.time) || "horário não informado") + " | 👥 " + (e.guests == null ? "convidados não informados" : fmtGuests(e) + " pessoas"));
+      out.push("🍸 " + BAR[e.bar].t);
+    });
+  });
+  return out.join("\n");
+}
+
+function renderWeekReport() {
+  const start = rep.weekStart, end = addDays(start, 6);
+  $("rw-label").textContent = fmtDM(start) + " a " + fmtDM(end);
+  const a = dkey(start), b = dkey(end);
+  const ev = ALL.filter(e => e.date >= a && e.date <= b && !e.block);
+  const by = {};
+  ev.forEach(e => (by[e.date] = by[e.date] || []).push(e));
+  const days = Object.keys(by).sort();
+  const sum = ev.reduce((x, e) => x + (e.guests || 0), 0);
+  const nog = ev.filter(e => e.guests == null).length;
+  $("rw-tot").textContent = ev.length
+    ? ev.length + (ev.length === 1 ? " evento" : " eventos") + " · " + sum.toLocaleString("pt-BR") + " convidados" + (nog ? " · " + nog + " sem número de convidados" : "")
+    : "Nenhum evento nesta semana.";
+  $("rw-list").innerHTML = days.map(k => {
+    const p = parse(k);
+    return `<h3>${WDAYS[wday(k)]}, ${pad(p.d)}/${pad(p.m + 1)}</h3>` + by[k].map(e =>
+      `<button class="ritem" data-s="${e.space}" data-id="${e.id}"><span class="rt">${hour(e.time) || "—"}</span><span class="rn">${esc(e.short)}</span><span class="rm">${SPACES[e.space]} · ${e.guests == null ? "convidados não informados" : fmtGuests(e) + " convidados"} · ${BAR[e.bar].t}</span></button>`).join("");
+  }).join("");
+  rep.text = weekText(start, end, by, days);
+  $("rw-text").value = rep.text;
+  $("rw-msg").textContent = "";
+}
+
+function pendencias(e) {
+  const m = [];
+  if (e.guests == null) m.push("convidados");
+  if (e.manual) return m;
+  if (e.bar === "nd") m.push("tipo de bar");
+  if (!e.docs.includes(BARTENDER)) m.push("PDF de Bartender");
+  if (!e.docs.includes(CRONO)) m.push("cronograma");
+  return m;
+}
+
+function renderPend() {
+  const slack = [], cal = [];
+  upcoming().forEach(e => { const m = pendencias(e); if (m.length) (e.src === "agenda" ? cal : slack).push({ e, m }); });
+  const row = ({ e, m }) => {
+    const p = parse(e.date);
+    return `<button class="pd-row" data-s="${e.space}" data-id="${e.id}"><span class="pn">${esc(e.short)}</span><span class="pm">${pad(p.d)}/${pad(p.m + 1)} · ${SPACES[e.space]}</span><span>${m.map(x => `<span class="miss">${x}</span>`).join("")}</span></button>`;
+  };
+  $("pd-tot").textContent = slack.length + (slack.length === 1 ? " evento do Slack com pendência" : " eventos do Slack com pendência") + " e " + cal.length + " " + (cal.length === 1 ? "evento" : "eventos") + " só no calendário, sem briefing.";
+  $("pd-list").innerHTML = slack.length ? slack.map(row).join("") : `<p class="muted">Nenhuma pendência nos eventos do Slack.</p>`;
+  const more = $("pd-more");
+  more.hidden = !cal.length;
+  more.textContent = rep.showCal ? "Esconder eventos só do calendário" : "Mostrar os " + cal.length + " eventos só do calendário";
+  $("pd-cal").innerHTML = rep.showCal ? `<h3>Só no calendário</h3>` + cal.map(row).join("") : "";
+}
+
+function renderPeaks() {
+  const by = {};
+  upcoming().forEach(e => (by[e.date] = by[e.date] || []).push(e));
+  const days = Object.keys(by).filter(k => by[k].length >= 2).map(k => ({
+    k, ev: by[k], n: by[k].length, g: by[k].reduce((x, e) => x + (e.guests || 0), 0), nog: by[k].filter(e => e.guests == null).length
+  })).sort((a, b) => b.n - a.n || b.g - a.g || a.k.localeCompare(b.k));
+  const shown = rep.allPeaks ? days : days.slice(0, 8);
+  $("pk-list").innerHTML = shown.length ? shown.map(d => {
+    const p = parse(d.k);
+    const sp = [...new Set(d.ev.map(e => e.space))].map(x => `<span class="psp" data-s="${x}"><i></i>${SPACES[x]}</span>`).join("");
+    return `<button class="pk-row" data-day="${d.k}"><span class="pdte">${pad(p.d)}/${pad(p.m + 1)}<small>${WDAYS[wday(d.k)]}</small></span><span class="pinfo">${sp}<b>${d.n} eventos</b> · ${d.g.toLocaleString("pt-BR")} convidados${d.nog ? " (" + d.nog + " sem número)" : ""}</span></button>`;
+  }).join("") : `<p class="muted">Nenhum dia com 2 ou mais eventos.</p>`;
+  const more = $("pk-more");
+  more.hidden = days.length <= 8;
+  more.textContent = rep.allPeaks ? "Mostrar só os 8 maiores" : "Mostrar todos os " + days.length + " dias";
+}
+
+function renderReports() {
+  if (!rep.weekStart) rep.weekStart = startOfWeek(new Date());
+  renderWeekReport(); renderPend(); renderPeaks();
+}
+
+function setTab(t) {
+  rep.tab = t;
+  $("view-cal").hidden = t !== "cal";
+  $("view-rep").hidden = t !== "rep";
+  document.querySelector(".nav").hidden = t !== "cal";
+  ["cal", "rep"].forEach(x => { const el = $("tab-" + x); el.setAttribute("aria-selected", String(x === t)); el.tabIndex = x === t ? 0 : -1; });
+  if (t === "rep") renderReports();
+  saveState();
+}
+
+$("tab-cal").addEventListener("click", () => setTab("cal"));
+$("tab-rep").addEventListener("click", () => setTab("rep"));
+$("rw-prev").addEventListener("click", () => { rep.weekStart = addDays(rep.weekStart, -7); renderWeekReport(); });
+$("rw-next").addEventListener("click", () => { rep.weekStart = addDays(rep.weekStart, 7); renderWeekReport(); });
+$("rw-today").addEventListener("click", () => { rep.weekStart = startOfWeek(new Date()); renderWeekReport(); });
+$("rw-copy").addEventListener("click", async () => {
+  const ta = $("rw-text");
+  try {
+    await navigator.clipboard.writeText(rep.text);
+    $("rw-msg").textContent = "Resumo copiado.";
+  } catch (_) {
+    ta.hidden = false; ta.focus(); ta.select();
+    $("rw-msg").textContent = "Não consegui copiar sozinho. O texto está selecionado abaixo: copie com Ctrl+C.";
+  }
+});
+$("pd-more").addEventListener("click", () => { rep.showCal = !rep.showCal; renderPend(); });
+$("pk-more").addEventListener("click", () => { rep.allPeaks = !rep.allPeaks; renderPeaks(); });
+$("pk-list").addEventListener("click", ev => {
+  const b = ev.target.closest("[data-day]");
+  if (!b) return;
+  const p = parse(b.dataset.day);
+  view = clampMonth(p.y, p.m);
+  setTab("cal");
+  renderCal();
+});
+
 const reopen = loadState();
 renderCal();
+if (rep.tab === "rep") setTab("rep");
 if (reopen !== null && EVENTS.some(x => x.id === reopen)) openEvent(reopen, true);
 initDb();
 </script>
