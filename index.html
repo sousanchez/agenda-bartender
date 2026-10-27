@@ -352,7 +352,19 @@ const EVENTS = [
 
   /* Novos no canal (rotina de atualização) */
   { id: 47, date: "2026-11-19", space: "serra", name: "Denis Robert Silva de Oliveira e Vitória", short: "Denis e Vitória", time: "16:00", guests: 110, tables: "16 + mesa dos noivos", party: "Não informado", bar: "so",
-    obs: ["Bar sem álcool", "Assessoria externa"], docs: [BARTENDER, CRONO] }
+    obs: ["Bar sem álcool", "Assessoria externa"], docs: [BARTENDER, CRONO] },
+  { id: 48, date: "2026-11-20", space: "serra", name: "Gilvania Oliveira Arruda e Thiago", short: "Gilvania e Thiago", time: "17:00", guests: 160, tables: "20 + mesa dos noivos", party: "Não informado", bar: "cs",
+    obs: ["Teremos chope e long neck"], docs: [BARTENDER, CRONO] },
+  { id: 49, date: "2026-11-20", space: "florest", name: "Isabela Leandro Santos e Carlos", short: "Isabela e Carlos", time: "17:00", guests: 140, staff: 19, tables: "18", party: "6h de festa", bar: "cs",
+    obs: ["Chopp pilsen (100 litros)", "Chopp vinho (50 litros)"], docs: [BARTENDER, CRONO] },
+  { id: 50, date: "2026-11-21", space: "florest", name: "Marcela Coury Pinto e Luiz", short: "Marcela e Luiz", time: "15:00", guests: 120, tables: "14 + mesa dos noivos", party: "Não informado", bar: "cs",
+    obs: ["Convite às 15h, na igreja", "Terá chope", "Os noivos trazem tequila", "Troca de drinks combinada: tiraram o Negroni e o Gin Tônica e entrou o Fitzgerald"], docs: [BARTENDER, CRONO] },
+  { id: 51, date: "2026-11-21", space: "acqua", name: "Matheus Antunes Pereira e Leticia", short: "Matheus e Leticia", time: "15:30", guests: 180, tables: "27 + mesa da família", party: "6h de festa", bar: "cs",
+    obs: ["Long neck", "Fitzgerald com insumos trazidos pelos noivos"], docs: [BARTENDER, CRONO] },
+  { id: 52, date: "2026-11-22", space: "acqua", name: "Camila Agostinis Silva e Lucas", short: "Camila e Lucas", time: "14:00", guests: 170, tables: "23 + mesa dos noivos", party: "8h de festa", bar: "cs",
+    obs: ["Long neck"], docs: [BARTENDER, CRONO] },
+  { id: 53, date: "2026-11-22", space: "serra", name: "Murilo Matos Bernardo e Kaillany", short: "Murilo e Kaillany", time: "14:30", guests: 167, tables: "23", party: "6h de festa", bar: "cs",
+    obs: ["Bar ilha com limão siciliano central", "Não possuem outro tipo de bebida contratada"], docs: [BARTENDER, "Foto de referência"] }
 ];
 
 /* Cardápios conforme os PDFs de Bartender de cada evento. Sem PDF = sem cardápio. */
@@ -410,7 +422,13 @@ const DRINKS = {
   43: { com: ["Caipirinha", "Caipiroska", "Saquêrinhas", "Gin Tônica", "Mojito", "Aperol Spritz", "Moscow Mule", "Negroni", "Mango Passion"], sem: SEM4 },
   44: { com: ["Caipirinha (pinga Salinas)", "Caipiroska (vodka Smirnoff)", "Saquêrinhas (saquê Fuji e Sakeih)", "Espanhola (vinho)", "Lagoa Azul", "Gin Tônica (gin Tanqueray)", "Mojito", "Aperol Spritz", "Moscow Mule", "Negroni", "Sex on the Beach"], sem: SEM4 },
   45: { com: ["Caipirinha", "Caipiroska", "Saquêrinhas", "Espanhola", "Sex on the Beach", "Lagoa Azul", "Mojito", "Gin Tônica (gin Tanqueray)", "Moscow Mule", "Negroni", "Aperol Spritz"], sem: SEM4 }
-  , 47: { com: [], sem: SEM9 }
+  , 47: { com: [], sem: SEM9 },
+  48: { com: ["Caipirinha (cachaça Salinas ou equivalente)", "Caipiroska (vodka Smirnoff ou equivalente)", "Saquêrinhas (saquê Fuji e/ou Sakeih ou equivalente)", "Aperol Spritz", "Gin Tônica (gin Tanqueray)", "Limoncello Spritz", "Moscow Mule", "Negroni", "Mojito"], sem: ["Soda Italiana", "Piña Colada", "Limonada Suíça"] },
+  49: { com: COM11, sem: SEM4 },
+  50: { com: ["Caipirinha (cachaça Salinas ou equivalente)", "Caipiroska (vodka Smirnoff ou equivalente)", "Saquêrinhas (saquê Fuji e/ou Sakeih ou equivalente)", "Aperol Spritz", "Limoncello Spritz", "Moscow Mule", "Mojito", "Sex on the Beach", "Fitzgerald"], sem: ["Piña Colada", "Limonada Suíça", "Soda Italiana"] },
+  51: { com: ["Caipirinha", "Caipiroska", "Saquêrinhas", "Gin Tônica", "Mojito", "Aperol Spritz", "Moscow Mule", "Negroni", "Mango Passion", "Fitzgerald (insumos trazidos pelos noivos)"], sem: SEM4 },
+  52: { com: COM11, sem: SEM4 },
+  53: { com: COM11, sem: SEM4 }
   /* Sem cardápio (sem PDF de Bartender): 2 (José Carlos), 16 (Matheus e Daisy), 46 (Oficina) */
 };
 
